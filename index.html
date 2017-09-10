@@ -1,0 +1,610 @@
+
+<!DOCTYPE html>
+<html class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+        <link rel="canonical" href="https://redisgraph.io/">
+      
+      
+      
+        <link rel="shortcut icon" href="./images/favicon.png">
+      
+      <meta name="generator" content="mkdocs-0.16.2, mkdocs-material-1.3.0">
+    
+    
+      
+        <title>Redis Graph - a graph database module for Redis</title>
+      
+    
+    
+      <script src="./assets/javascripts/modernizr-56ade86843.js"></script>
+    
+    
+      <link rel="stylesheet" href="./assets/stylesheets/application-1d1da4857d.css">
+      
+        <link rel="stylesheet" href="./assets/stylesheets/application-66fa0d9bba.palette.css">
+      
+    
+    
+      
+        
+        
+        
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+      <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+    
+    
+  </head>
+  
+  
+  
+  
+    <body data-md-color-primary="indigo" data-md-color-accent="">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="drawer">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="search">
+    <label class="md-overlay" data-md-component="overlay" for="drawer"></label>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          <a href="." title="Redis Graph - a graph database module for Redis" class="md-logo md-header-nav__button">
+            <img src="./images/logo.svg" width="24" height="24">
+          </a>
+        
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <span class="md-flex__ellipsis md-header-nav__title">
+          
+            
+              
+            
+            Quickstart
+          
+        </span>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          <label class="md-icon md-icon--search md-header-nav__button" for="search"></label>
+          
+<div class="md-search" data-md-component="search">
+  <div class="md-search__overlay"></div>
+  <div class="md-search__inner">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" placeholder="Search" accesskey="s" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query">
+      <label class="md-icon md-search__icon" for="search"></label>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+        
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <div class="md-header-nav__source">
+          
+            
+
+
+  
+
+
+  <a href="https://github.com/RedisLabsModules/redis-graph" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      RedisLabsModules/redis-graph
+    </div>
+  </a>
+
+          
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+      
+      <main class="md-main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="drawer">
+    
+      <i class="md-logo md-nav__button">
+        <img src="./images/logo.svg">
+      </i>
+    
+    Redis Graph - a graph database module for Redis
+  </label>
+  
+    <div class="md-nav__source">
+      
+
+
+  
+
+
+  <a href="https://github.com/RedisLabsModules/redis-graph" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      RedisLabsModules/redis-graph
+    </div>
+  </a>
+
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="toc">
+        Quickstart
+      </label>
+    
+    <a href="." title="Quickstart" class="md-nav__link md-nav__link--active">
+      Quickstart
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#quickstart" title="Quickstart" class="md-nav__link">
+    Quickstart
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#building-the-module" title="Building the module" class="md-nav__link">
+    Building the module
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#linux-ubuntu-1604" title="Linux Ubuntu 16.04" class="md-nav__link">
+    Linux Ubuntu 16.04
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#loading-the-module-to-redis" title="Loading the module to Redis" class="md-nav__link">
+    Loading the module to Redis
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-redis-graph" title="Using Redis Graph" class="md-nav__link">
+    Using Redis Graph
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#with-redis-cli" title="With redis-cli" class="md-nav__link">
+    With redis-cli
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#with-any-other-client" title="With any other client" class="md-nav__link">
+    With any other client
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python-example" title="Python example" class="md-nav__link">
+    Python example
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#client-libraries" title="Client libraries" class="md-nav__link">
+    Client libraries
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="commands/" title="Commands" class="md-nav__link">
+      Commands
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="design/" title="Design" class="md-nav__link">
+      Design
+    </a>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#quickstart" title="Quickstart" class="md-nav__link">
+    Quickstart
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#building-the-module" title="Building the module" class="md-nav__link">
+    Building the module
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#linux-ubuntu-1604" title="Linux Ubuntu 16.04" class="md-nav__link">
+    Linux Ubuntu 16.04
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#loading-the-module-to-redis" title="Loading the module to Redis" class="md-nav__link">
+    Loading the module to Redis
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-redis-graph" title="Using Redis Graph" class="md-nav__link">
+    Using Redis Graph
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#with-redis-cli" title="With redis-cli" class="md-nav__link">
+    With redis-cli
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#with-any-other-client" title="With any other client" class="md-nav__link">
+    With any other client
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python-example" title="Python example" class="md-nav__link">
+    Python example
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#client-libraries" title="Client libraries" class="md-nav__link">
+    Client libraries
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                <h1 id="redis-graph">Redis Graph<a class="headerlink" href="#redis-graph" title="Permanent link">&para;</a></h1>
+<p>This project is a Redis module that implements a graph database. Nodes in the graph represent entities such as persons or places, and connections such as 'visit' are made between the different entities.</p>
+<p>Suppose we had a person entity representing Barack Obama, it might have two attributes: "age" (55) and "profession" (ex-president). We could also have another entity represent Hawaii with an attribute "population" (1442949). Finally we could construct a simple graph by connecting Barack Obama with an edge representing the relation "born" with Hawaii.</p>
+<p>Primary features:</p>
+<ul>
+<li>A graph database implementation</li>
+<li>Nodes and edges may have attributes</li>
+<li>Nodes and edges can be labeled</li>
+<li>Supports Neo4j's <a href="http://www.opencypher.org/">openCypher</a> queries</li>
+</ul>
+<p>To see Redis Graph in action see <a href="https://github.com/RedisLabsModules/redis-module-graph/tree/master/Demo">Demos</a>.</p>
+<h2 id="quickstart">Quickstart<a class="headerlink" href="#quickstart" title="Permanent link">&para;</a></h2>
+<ol>
+<li><a href="#building-the-module">Build the Redis Graph module library</a></li>
+<li><a href="#loading-the-module-to-redis">Load Redis Graph to Redis</a></li>
+<li><a href="#using-redis-graph">Use it from any client</a></li>
+</ol>
+<h2 id="building-the-module">Building the module<a class="headerlink" href="#building-the-module" title="Permanent link">&para;</a></h2>
+<h3 id="linux-ubuntu-1604">Linux Ubuntu 16.04<a class="headerlink" href="#linux-ubuntu-1604" title="Permanent link">&para;</a></h3>
+<p>Requirements:</p>
+<ul>
+<li>The Redis Graph repository: <code>git clone https://github.com/RedisLabsModules/redis-module-graph.git</code></li>
+<li>The build-essential and cmake packages: <code>apt-get install build-essential cmake</code></li>
+</ul>
+<p>To build the module, run the following in the project's directory:</p>
+<div class="codehilite"><pre><span></span>cmake . <span class="o">&amp;&amp;</span> make module
+</pre></div>
+
+
+<p>Congratulations! You can find the compiled module library at <code>src/libmodule.so</code>.</p>
+<h2 id="loading-the-module-to-redis">Loading the module to Redis<a class="headerlink" href="#loading-the-module-to-redis" title="Permanent link">&para;</a></h2>
+<p>Requirements:</p>
+<ul>
+<li><a href="https://redis.io/download">Redis v4.0 or above</a></li>
+</ul>
+<p>We recommend you have Redis load the module during startup by adding the following to your redis.conf file:</p>
+<div class="codehilite"><pre><span></span>loadmodule /path/to/module/libmodule.so
+</pre></div>
+
+
+<p>In the line above replace <code>/path/to/module/libmodule.so</code> with the actual path to the module's library. Alternatively, you can have Redis load the module using the following command line argument syntax:</p>
+<div class="codehilite"><pre><span></span>~/$ redis-server --loadmodule /path/to/module/libmodule.so
+</pre></div>
+
+
+<p>Lastly, you can also use the <a href="http://redis.io/commands/module-load"><code>MODULE LOAD</code></a> command. Note, however, that <code>MODULE LOAD</code> is a dangerous command and may be blocked/deprecated in the future due to security considerations.</p>
+<p>Once the module has been loaded successfully, the Redis log should have lines similar to:</p>
+<div class="codehilite"><pre><span></span>...
+30707:M 20 Jun 02:08:12.314 * Module &#39;graph&#39; loaded from &lt;redacted&gt;/src/libmodule.so
+...
+</pre></div>
+
+
+<h2 id="using-redis-graph">Using Redis Graph<a class="headerlink" href="#using-redis-graph" title="Permanent link">&para;</a></h2>
+<p>Before using Redis Graph, you should familiarize yourself with its commands and syntax as detailed in the <a href="./commands">commands reference</a> document.</p>
+<p>You can call Redis Graph's commands from any Redis client.</p>
+<h3 id="with-redis-cli">With <code>redis-cli</code><a class="headerlink" href="#with-redis-cli" title="Permanent link">&para;</a></h3>
+<div class="codehilite"><pre><span></span>$ redis-cli
+<span class="m">127</span>.0.0.1:6379&gt; GRAPH.CREATENODE social person name roi age <span class="m">32</span> gender male status married
+<span class="s2">&quot;459034279876493568&quot;</span>
+</pre></div>
+
+
+<h3 id="with-any-other-client">With any other client<a class="headerlink" href="#with-any-other-client" title="Permanent link">&para;</a></h3>
+<p>You can call the module's API using your client's ability to send raw Redis commands. Depending on your client of choice, the exact method for doing that may vary.</p>
+<h4 id="python-example">Python example<a class="headerlink" href="#python-example" title="Permanent link">&para;</a></h4>
+<p>This code snippet shows how to use Redis Graph with raw Redis commands from Python with <a href="https://github.com/andymccurdy/redis-py">redis-py</a>:</p>
+<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">redis</span>
+
+<span class="n">r</span> <span class="o">=</span> <span class="n">redis</span><span class="o">.</span><span class="n">StrictRedis</span><span class="p">()</span>
+<span class="n">reply</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">execute_command</span><span class="p">(</span><span class="s1">&#39;GRAPH.CREATENODE&#39;</span><span class="p">,</span> <span class="s1">&#39;social&#39;</span><span class="p">,</span> <span class="s1">&#39;person&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;roi&#39;</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="s1">&#39;gender&#39;</span><span class="p">,</span> <span class="s1">&#39;male&#39;</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="s1">&#39;married&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<h3 id="client-libraries">Client libraries<a class="headerlink" href="#client-libraries" title="Permanent link">&para;</a></h3>
+<p>Some languages have client libraries that provide support for Redis Graph's commands:</p>
+<table>
+<thead>
+<tr>
+<th>Project</th>
+<th>Language</th>
+<th>License</th>
+<th>Author</th>
+<th>URL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TBD</td>
+<td>Python</td>
+<td>TBD</td>
+<td><a href="https://redislabs.com">Redis Labs</a></td>
+<td><a href="https://github.com/swilly22/redis-module-graph/tree/master/Demo/client">GitHub</a></td>
+</tr>
+</tbody>
+</table>
+                
+                  
+                
+              
+              
+                
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+        
+          <a href="commands/" title="Commands" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Commands
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        powered by
+        <a href="http://www.mkdocs.org" title="MkDocs">MkDocs</a>
+        and
+        <a href="http://squidfunk.github.io/mkdocs-material/" title="Material for MkDocs">
+          Material for MkDocs</a>
+      </div>
+      
+        
+  <div class="md-footer-social">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    
+      <a href="https://github.com/redislabs" class="md-footer-social__link fa fa-github"></a>
+    
+      <a href="https://twitter.com/redislabs" class="md-footer-social__link fa fa-twitter"></a>
+    
+  </div>
+
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="./assets/javascripts/application-7aa26ad9ec.js"></script>
+      <script>app.initialize({url:{base:"."}})</script>
+      
+    
+    
+      
+    
+  </body>
+</html>

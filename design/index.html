@@ -1,0 +1,784 @@
+
+<!DOCTYPE html>
+<html class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+        <link rel="canonical" href="https://redisgraph.io/design/">
+      
+      
+      
+        <link rel="shortcut icon" href="../images/favicon.png">
+      
+      <meta name="generator" content="mkdocs-0.16.2, mkdocs-material-1.3.0">
+    
+    
+      
+        <title>Design - Redis Graph - a graph database module for Redis</title>
+      
+    
+    
+      <script src="../assets/javascripts/modernizr-56ade86843.js"></script>
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/application-1d1da4857d.css">
+      
+        <link rel="stylesheet" href="../assets/stylesheets/application-66fa0d9bba.palette.css">
+      
+    
+    
+      
+        
+        
+        
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700|Roboto+Mono">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+      <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+    
+    
+  </head>
+  
+  
+  
+  
+    <body data-md-color-primary="indigo" data-md-color-accent="">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="drawer">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="search">
+    <label class="md-overlay" data-md-component="overlay" for="drawer"></label>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          <a href=".." title="Redis Graph - a graph database module for Redis" class="md-logo md-header-nav__button">
+            <img src="../images/logo.svg" width="24" height="24">
+          </a>
+        
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <span class="md-flex__ellipsis md-header-nav__title">
+          
+            
+              
+            
+            Design
+          
+        </span>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          <label class="md-icon md-icon--search md-header-nav__button" for="search"></label>
+          
+<div class="md-search" data-md-component="search">
+  <div class="md-search__overlay"></div>
+  <div class="md-search__inner">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" placeholder="Search" accesskey="s" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query">
+      <label class="md-icon md-search__icon" for="search"></label>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+        
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <div class="md-header-nav__source">
+          
+            
+
+
+  
+
+
+  <a href="https://github.com/RedisLabsModules/redis-graph" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      RedisLabsModules/redis-graph
+    </div>
+  </a>
+
+          
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+      
+      <main class="md-main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="drawer">
+    
+      <i class="md-logo md-nav__button">
+        <img src="../images/logo.svg">
+      </i>
+    
+    Redis Graph - a graph database module for Redis
+  </label>
+  
+    <div class="md-nav__source">
+      
+
+
+  
+
+
+  <a href="https://github.com/RedisLabsModules/redis-graph" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      RedisLabsModules/redis-graph
+    </div>
+  </a>
+
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href=".." title="Quickstart" class="md-nav__link">
+      Quickstart
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../commands/" title="Commands" class="md-nav__link">
+      Commands
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="toc">
+        Design
+      </label>
+    
+    <a href="./" title="Design" class="md-nav__link md-nav__link--active">
+      Design
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#abstract" title="Abstract" class="md-nav__link">
+    Abstract
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#redigraph-at-a-glance" title="RediGraph At-a-Glance" class="md-nav__link">
+    RediGraph At-a-Glance
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-little-taste-redigraph-in-action" title="A Little Taste: RediGraph in Action" class="md-nav__link">
+    A Little Taste: RediGraph in Action
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#introducing-our-entities" title="Introducing our entities:" class="md-nav__link">
+    Introducing our entities:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#connecting-entities" title="Connecting entities:" class="md-nav__link">
+    Connecting entities:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#querying-the-graph" title="Querying the graph:" class="md-nav__link">
+    Querying the graph:
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-theory-ideas-behind-redisgraph" title="The Theory: Ideas behind RedisGraph" class="md-nav__link">
+    The Theory: Ideas behind RedisGraph
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#graph-representation-hexastore" title="Graph representation: Hexastore" class="md-nav__link">
+    Graph representation: Hexastore
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#query-language-cypher" title="Query language: Cypher" class="md-nav__link">
+    Query language: Cypher
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#runtime-query-execution" title="Runtime: query execution" class="md-nav__link">
+    Runtime: query execution
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query-parser" title="Query parser" class="md-nav__link">
+    Query parser
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filter-tree" title="Filter tree" class="md-nav__link">
+    Filter tree
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#query-processing" title="Query processing" class="md-nav__link">
+    Query processing
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#benchmarks" title="Benchmarks" class="md-nav__link">
+    Benchmarks
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#license" title="License" class="md-nav__link">
+    License
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conclusion" title="Conclusion" class="md-nav__link">
+    Conclusion
+  </a>
+  
+</li>
+      
+      
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#abstract" title="Abstract" class="md-nav__link">
+    Abstract
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#redigraph-at-a-glance" title="RediGraph At-a-Glance" class="md-nav__link">
+    RediGraph At-a-Glance
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-little-taste-redigraph-in-action" title="A Little Taste: RediGraph in Action" class="md-nav__link">
+    A Little Taste: RediGraph in Action
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#introducing-our-entities" title="Introducing our entities:" class="md-nav__link">
+    Introducing our entities:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#connecting-entities" title="Connecting entities:" class="md-nav__link">
+    Connecting entities:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#querying-the-graph" title="Querying the graph:" class="md-nav__link">
+    Querying the graph:
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-theory-ideas-behind-redisgraph" title="The Theory: Ideas behind RedisGraph" class="md-nav__link">
+    The Theory: Ideas behind RedisGraph
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#graph-representation-hexastore" title="Graph representation: Hexastore" class="md-nav__link">
+    Graph representation: Hexastore
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#query-language-cypher" title="Query language: Cypher" class="md-nav__link">
+    Query language: Cypher
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#runtime-query-execution" title="Runtime: query execution" class="md-nav__link">
+    Runtime: query execution
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query-parser" title="Query parser" class="md-nav__link">
+    Query parser
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filter-tree" title="Filter tree" class="md-nav__link">
+    Filter tree
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#query-processing" title="Query processing" class="md-nav__link">
+    Query processing
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#benchmarks" title="Benchmarks" class="md-nav__link">
+    Benchmarks
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#license" title="License" class="md-nav__link">
+    License
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conclusion" title="Conclusion" class="md-nav__link">
+    Conclusion
+  </a>
+  
+</li>
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                <h1 id="redisgraph-a-high-performance-in-memory-graph-database-as-a-redis-module">RedisGraph: A High Performance In-Memory Graph Database as a Redis Module<a class="headerlink" href="#redisgraph-a-high-performance-in-memory-graph-database-as-a-redis-module" title="Permanent link">&para;</a></h1>
+<h2 id="abstract">Abstract<a class="headerlink" href="#abstract" title="Permanent link">&para;</a></h2>
+<p>Graph based data is everywhere now days, Facebook, Google, Twitter and Pinterest are only a few who've realize the power behind relationship data and are utilizing it to the fullest, as a direct result we see a rise both in interest and variety of graph data solutions.</p>
+<p>With the introduction of <a href="http://antirez.com/news/106">Redis Modules</a> we've seen the great potential of introducing a graph data structure to Redis arsenal,
+a native C implementation with emphasis on performance was developed to bring new graph database capabilities to Redis,
+the <a href="http://redismodules.com/modules/redis-graph/">RedisGraph</a> is now available as an open source project on <a href="https://github.com/swilly22/redis-module-graph">GitHub</a>.</p>
+<p>In this document we'll discuss the internal design and feature of RegisGraph and demonstrate its current capabilities.</p>
+<h2 id="redigraph-at-a-glance">RediGraph At-a-Glance<a class="headerlink" href="#redigraph-at-a-glance" title="Permanent link">&para;</a></h2>
+<p>RediGraph is a graph database developed from scratch on top of Redis, using the new Redis Modules API to extend Redis with new commands and capabilities. Its main features include:
+- Simple, fast indexing and querying
+- Data stored in RAM, using memory-efficient custom data structures
+- On disk persistence
+- Tabular result sets
+- Simple and popular query language (Cypher)
+- Data Filtering, Aggregation and ordering</p>
+<h2 id="a-little-taste-redigraph-in-action">A Little Taste: RediGraph in Action<a class="headerlink" href="#a-little-taste-redigraph-in-action" title="Permanent link">&para;</a></h2>
+<p>Let’s look at some of the key concepts of RediGraph using this example over the redis-cli tool:</p>
+<h3 id="introducing-our-entities">Introducing our entities:<a class="headerlink" href="#introducing-our-entities" title="Permanent link">&para;</a></h3>
+<p>It is a common concept to represent entities as nodes within a graph, In this example, we'll create a small graph with both actors and movies as its entities,
+an "act" relation will connect actors to movies they casted in.</p>
+<p>We use the graph.CREATENODE command to create a new entity:</p>
+<div class="codehilite"><pre><span></span>graph.CREATENODE &lt;graph_id&gt; &lt;label&gt; &lt;attribute_name&gt; &lt;attribute_value&gt; &lt;attribute_name&gt; &lt;attribute_value&gt; ...
+</pre></div>
+
+
+<p>Or in our example:</p>
+<div class="codehilite"><pre><span></span>graph.CREATENODE IMDB actor name <span class="s2">&quot;Aldis Hodge&quot;</span> birth_year <span class="m">1986</span>
+graph.CREATENODE IMDB actor name <span class="s2">&quot;OShea Jackson&quot;</span> birth_year <span class="m">1991</span>
+graph.CREATENODE IMDB actor name <span class="s2">&quot;Corey Hawkins&quot;</span> birth_year <span class="m">1988</span>
+graph.CREATENODE IMDB actor name <span class="s2">&quot;Neil Brown&quot;</span> birthyear <span class="m">1980</span>
+graph.CREATENODE IMDB movie title <span class="s2">&quot;Straight Outta Compton&quot;</span> genre Biography votes <span class="m">127258</span> rating <span class="m">7</span>.9 year <span class="m">2015</span>
+graph.CREATENODE IMDB movie title <span class="s2">&quot;Never Go Back&quot;</span> gener Action votes <span class="m">15821</span> rating <span class="m">6</span>.4 year <span class="m">2016</span>
+</pre></div>
+
+
+<h3 id="connecting-entities">Connecting entities:<a class="headerlink" href="#connecting-entities" title="Permanent link">&para;</a></h3>
+<p>It is now time to form relationships between actors and movies, we use RedisGraph ADDEDGE command and specify the source entity, type of connection and destination entity as such:</p>
+<div class="codehilite"><pre><span></span>GRAPH.ADDEDGE &lt;graph_id&gt; &lt;src_entity_id&gt; &lt;relation&gt; &lt;dest_entity_id&gt;
+</pre></div>
+
+
+<p>Adding the Straight Outta Compton cast:</p>
+<div class="codehilite"><pre><span></span>GRAPH.ADDEDGE IMDB &lt;Aldis_Hodge node id&gt; act &lt;Straight_Outta_Compton node id&gt;
+GRAPH.ADDEDGE IMDB &lt;OShea_Jackson node id&gt; act &lt;Straight_Outta_Compton node id&gt;
+GRAPH.ADDEDGE IMDB &lt;Corey_Hawkins node id&gt; act &lt;Straight_Outta_Compton node id&gt;
+GRAPH.ADDEDGE IMDB &lt;Neil_Brown node id&gt; act &lt;Straight_Outta_Compton node id&gt;
+</pre></div>
+
+
+<p>Adding the only cast member who also played in the movie Never Go Back.</p>
+<div class="codehilite"><pre><span></span>GRAPH.ADDEDGE IMDB &lt;Aldis_Hodge node id&gt; act &lt;Never_Go_Back node id&gt;
+</pre></div>
+
+
+<h3 id="querying-the-graph">Querying the graph:<a class="headerlink" href="#querying-the-graph" title="Permanent link">&para;</a></h3>
+<p>RedisGraph exposes a subset of Neo4J Cypher language, although only a number of language capabilities are supported there's enough functionality to extract valuable insights from your graphs, to execute a query we use the GRAPH.QUERY command:</p>
+<div class="codehilite"><pre><span></span>GRAPH.QUERY &lt;graph_id&gt; &lt;query&gt;
+</pre></div>
+
+
+<p>Let's execute a number of queries against our movies graph:</p>
+<p>Find the sum, max, min and avg age of the Straight Outta Compton cast:</p>
+<div class="codehilite"><pre><span></span>GRAPH.QUERY IMDB <span class="s2">&quot;MATCH (a:actor)-[act]-&gt;(m:movie {title:\&quot;Straight Outta Compton\&quot;})</span>
+<span class="s2">RETURN m.title, SUM(a.age), MAX(a.age), MIN(a.age), AVG(a.age)&quot;</span>
+</pre></div>
+
+
+<p>RedisGraph will reply with:</p>
+<div class="codehilite"><pre><span></span><span class="m">1</span><span class="o">)</span> <span class="s2">&quot;m.title, SUM(a.age), MAX(a.age), MIN(a.age), AVG(a.age)&quot;</span>
+<span class="m">2</span><span class="o">)</span> <span class="s2">&quot;Straight Outta Compton,123.000000,37.000000,26.000000,30.750000&quot;</span>
+<span class="m">3</span><span class="o">)</span> <span class="s2">&quot;Query internal execution time: 0.071000 milliseconds&quot;</span>
+</pre></div>
+
+
+<p>The first row is our result-set hearder which name each column according to the return clause.
+Second row contains our query result.
+Last row contains RedisGraph execution time.</p>
+<p>Let's try another query, this time we'll find in how many movies each actor played.</p>
+<div class="codehilite"><pre><span></span>GRAPH.QUERY IMDB <span class="s2">&quot;MATCH (actor)-[act]-&gt;(movie) RETURN actor.name, COUNT(movie.title) AS movies_count ORDER BY movies_count DESC&quot;</span>
+
+<span class="m">1</span><span class="o">)</span> <span class="s2">&quot;actor.name, movies_count&quot;</span>
+<span class="m">2</span><span class="o">)</span> <span class="s2">&quot;Aldis Hodge,2.000000&quot;</span>
+<span class="m">3</span><span class="o">)</span> <span class="s2">&quot;O&#39;Shea Jackson,1.000000&quot;</span>
+<span class="m">4</span><span class="o">)</span> <span class="s2">&quot;Corey Hawkins,1.000000&quot;</span>
+<span class="m">5</span><span class="o">)</span> <span class="s2">&quot;Neil Brown,1.000000&quot;</span>
+<span class="m">6</span><span class="o">)</span> <span class="s2">&quot;Query internal execution time: 0.071000 milliseconds&quot;</span>
+</pre></div>
+
+
+<h2 id="the-theory-ideas-behind-redisgraph">The Theory: Ideas behind RedisGraph<a class="headerlink" href="#the-theory-ideas-behind-redisgraph" title="Permanent link">&para;</a></h2>
+<p>Different graph databases uses different structures for representing a graph, some use adjacency list others might use an adjacency matrix, each with its advantages and disadvantages, For RedisGraph it was crucial to find a data structure which will enable us to perform fast searches on the graph, and so we're using a concept called Hexastore to hold all relationships within a graph.</p>
+<h3 id="graph-representation-hexastore">Graph representation: Hexastore<a class="headerlink" href="#graph-representation-hexastore" title="Permanent link">&para;</a></h3>
+<p>A Hexastore is simply a list of triplets, where each triplet is composed of three parts:</p>
+<ol>
+<li>Subject</li>
+<li>Predicate</li>
+<li>Object</li>
+</ol>
+<p>Where the Subject refers to a source node, Predicate represents a relationship and the Object refers to a destination node.
+For each relationship within a graph our hexastore will contain all six permutation of the source node, relationship edge and destination node, for example consider the following relation:</p>
+<p><code>(Aldis_Hodge)-[act]-&gt;(Straight_Outta_Compton)</code></p>
+<p>Aldis_Hodge is the source node
+act is the relationship
+and Straight_Outta_Compton is the destination node.</p>
+<p>All six possibilities of representing this connection are as follows:</p>
+<div class="codehilite"><pre><span></span>SPO:Aldis_Hodge:act:Straight_Outta_Compton
+SOP:Aldis_Hodge:Straight_Outta_Compton:act
+POS:act:Straight_Outta_Compton:Aldis_Hodge
+PSO:act:Aldis_Hodge:Straight_Outta_Compton
+OPS:Straight_Outta_Compton:act:Aldis_Hodge
+OSP:Straight_Outta_Compton:Aldis_Hodge:act
+</pre></div>
+
+
+<p>With the Hexastore constructed we can easily search our graph, suppose I would like to find the cast of the movie Straight Outta Compton, all I've to do is search my Hexastore for all strings containing the prefix: <code>OPS:Straight_Outta_Compton:act:*</code></p>
+<p>Or if I'm interested in all the movies Aldis Hodge played in I can search for all strings containing the prefix: <code>SPO:Aldis_Hodge:act:*</code></p>
+<p>Although a Hexastore uses plenty of memory, six triplets for each relation, we're using a trie data structure which is not only fast in terms of search but is also memory efficient as it doesn't create duplication of string prefixes it already seen.</p>
+<h3 id="query-language-cypher">Query language: Cypher<a class="headerlink" href="#query-language-cypher" title="Permanent link">&para;</a></h3>
+<p>There are a number of Graph Query languages, we didn't want to reinvent the wheel and come up with our own language,
+and so we've decided to implement a subset of one of the most popular graph query language out there Cypher by Neo4J,
+the Open-Cypher project provides means to create a parser for the language, although convenient
+we decided to create our own parser with Lex as a tokenizer and Lemon which generates a C target parser.</p>
+<p>As mentioned only a subset of the language is supported, but it is our intention to continue adding new capabilities and extend the language.</p>
+<h2 id="runtime-query-execution">Runtime: query execution<a class="headerlink" href="#runtime-query-execution" title="Permanent link">&para;</a></h2>
+<p>Let's review the steps our module takes when executing a query,
+consider the following query which finds all actors who've played alongside Aldis Hodge and are over 30 years old:</p>
+<div class="codehilite"><pre><span></span>MATCH (aldis::actor {name:&quot;Aldis Hodge&quot;})-[act]-&gt;(m:movie)&lt;-[act]-(a:actor) WHERE a.age &gt; 30 RETURN m.title, a.name
+</pre></div>
+
+
+<p>RediGraph will
+- Parse query, build abstract syntax tree (AST)
+- Construct a query execution plan composed of:
+  - Label scan operation
+  - Filter operation (filter tree)
+  - Expand operation
+  - Expand into operation
+- Execute plan
+- Populate result-set with matching entities attributes</p>
+<h3 id="query-parser">Query parser<a class="headerlink" href="#query-parser" title="Permanent link">&para;</a></h3>
+<p>Given a valid query the parser will generate an AST containing four primary nodes one for each clause:</p>
+<ol>
+<li>MATCH</li>
+<li>WHERE</li>
+<li>RETURN</li>
+<li>ORDER</li>
+</ol>
+<p>Generating an abstract syntax tree is a common way of discribing and structuring a language.</p>
+<h3 id="filter-tree">Filter tree<a class="headerlink" href="#filter-tree" title="Permanent link">&para;</a></h3>
+<p>A query can filter out entities by creating predicates, in our example we're filtering actors which are younger then 30.
+It's possible to combined predicates using the OR, AND keywords to form granular conditions. during runtime the WHERE clause is used
+to construct a filter tree, each node within the tree is either a condition e.g. A &gt; B or an operation (AND/OR), candidate entities are passed
+through the tree and get evaluated.</p>
+<h3 id="query-processing">Query processing<a class="headerlink" href="#query-processing" title="Permanent link">&para;</a></h3>
+<p>The MATCH clause describes relations between queried entities (nodes), a node can have an alias which will allow us to refer to it
+at later stages within the executing query lifetime (WHERE, RETURN clause), but all nodes must eventually be assign an ID,
+the process of assigning IDs to nodes is refer to as the search phase.</p>
+<p>During the search we'll be querying the Hexastore for IDs according to the MATCH clause structure,
+for instance in our example we'll start our search by looking for movies in which Aldis Hodge played in,
+for each movie we'll extend our search to find out which other
+actors played in the current processed movie.</p>
+<p>As you might imagine the search process is a recursive operation which traverse the graph, at each step a new ID is
+discovered, once every node has an ID assigned to it we can be assured that current entities have passed our filters,
+at this point we can extract requested attributes (as specified in the return clause) and append a new record to the final result set.</p>
+<h2 id="benchmarks">Benchmarks<a class="headerlink" href="#benchmarks" title="Permanent link">&para;</a></h2>
+<p>Depending on the underlying hardware results may vary, that said inserting a new relationship is done in O(1) RedisGraph is able to create 100K new relations within one second.</p>
+<p>Retrieving data really depends on the size of the graph and the type of query you're executing, on a small size graph ~1000 entities and ~2500 edges RedisGraph is able to perform ~65K friend of a friend query every second.</p>
+<p>It's worth mentioning that besides the hexastore, entities are not indexed, it’s our intention to introduce entities indexing which should decrease query execution time dramatically.</p>
+<h2 id="license">License<a class="headerlink" href="#license" title="Permanent link">&para;</a></h2>
+<p>Redis-Graph is published under AGPL-3.0.</p>
+<h2 id="conclusion">Conclusion<a class="headerlink" href="#conclusion" title="Permanent link">&para;</a></h2>
+<p>RedisGraph although still a young project, can be an alternative to other graph databases, with its subset of operations one can use it to analyze and explore its graph data, being a Redis module this project is accessible from every Redis client without the need to make any adjustments. It's our intention to keep on improving and extending RedisGraph with the help of the open source community.</p>
+                
+                  
+                
+              
+              
+                
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../commands/" title="Commands" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Commands
+              </span>
+            </div>
+          </a>
+        
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        powered by
+        <a href="http://www.mkdocs.org" title="MkDocs">MkDocs</a>
+        and
+        <a href="http://squidfunk.github.io/mkdocs-material/" title="Material for MkDocs">
+          Material for MkDocs</a>
+      </div>
+      
+        
+  <div class="md-footer-social">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    
+      <a href="https://github.com/redislabs" class="md-footer-social__link fa fa-github"></a>
+    
+      <a href="https://twitter.com/redislabs" class="md-footer-social__link fa fa-twitter"></a>
+    
+  </div>
+
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../assets/javascripts/application-7aa26ad9ec.js"></script>
+      <script>app.initialize({url:{base:".."}})</script>
+      
+    
+    
+      
+    
+  </body>
+</html>
