@@ -221,16 +221,104 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#graphcreatenode" title="GRAPH.CREATENODE" class="md-nav__link">
-    GRAPH.CREATENODE
+  <a href="#graphdelete" title="GRAPH.DELETE" class="md-nav__link">
+    GRAPH.DELETE
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#graphaddedge" title="GRAPH.ADDEDGE" class="md-nav__link">
-    GRAPH.ADDEDGE
+  <a href="#graphexplain" title="GRAPH.EXPLAIN" class="md-nav__link">
+    GRAPH.EXPLAIN
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#graphquery" title="GRAPH.QUERY" class="md-nav__link">
+    GRAPH.QUERY
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query-language" title="Query language" class="md-nav__link">
+    Query language
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#query-structure" title="Query structure" class="md-nav__link">
+    Query structure
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#match" title="MATCH" class="md-nav__link">
+    MATCH
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#where" title="WHERE" class="md-nav__link">
+    WHERE
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#return" title="RETURN" class="md-nav__link">
+    RETURN
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aggregations" title="Aggregations" class="md-nav__link">
+    Aggregations
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#order-by" title="ORDER BY" class="md-nav__link">
+    ORDER BY
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limit" title="LIMIT" class="md-nav__link">
+    LIMIT
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create" title="CREATE" class="md-nav__link">
+    CREATE
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -276,16 +364,104 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#graphcreatenode" title="GRAPH.CREATENODE" class="md-nav__link">
-    GRAPH.CREATENODE
+  <a href="#graphdelete" title="GRAPH.DELETE" class="md-nav__link">
+    GRAPH.DELETE
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#graphaddedge" title="GRAPH.ADDEDGE" class="md-nav__link">
-    GRAPH.ADDEDGE
+  <a href="#graphexplain" title="GRAPH.EXPLAIN" class="md-nav__link">
+    GRAPH.EXPLAIN
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#graphquery" title="GRAPH.QUERY" class="md-nav__link">
+    GRAPH.QUERY
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query-language" title="Query language" class="md-nav__link">
+    Query language
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#query-structure" title="Query structure" class="md-nav__link">
+    Query structure
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#match" title="MATCH" class="md-nav__link">
+    MATCH
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#where" title="WHERE" class="md-nav__link">
+    WHERE
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#return" title="RETURN" class="md-nav__link">
+    RETURN
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aggregations" title="Aggregations" class="md-nav__link">
+    Aggregations
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#order-by" title="ORDER BY" class="md-nav__link">
+    ORDER BY
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limit" title="LIMIT" class="md-nav__link">
+    LIMIT
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create" title="CREATE" class="md-nav__link">
+    CREATE
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -305,234 +481,203 @@
                 
                 
                 <h1 id="redis-graph-commands">Redis Graph Commands<a class="headerlink" href="#redis-graph-commands" title="Permanent link">&para;</a></h1>
-<h2 id="graphcreatenode">GRAPH.CREATENODE<a class="headerlink" href="#graphcreatenode" title="Permanent link">&para;</a></h2>
-<p>Creates a new node within the given graph, marked with a label (if provided).</p>
-<p>Arguments: <code>Graph name, label [optional], list of key value attributes</code></p>
-<p>Returns: <code>Node ID</code></p>
-<div class="codehilite"><pre><span></span>GRAPH.CREATENODE us_government president name <span class="s2">&quot;Barack Obama&quot;</span> age <span class="m">55</span>
+<h2 id="graphdelete">GRAPH.DELETE<a class="headerlink" href="#graphdelete" title="Permanent link">&para;</a></h2>
+<p>Deletes the entire graph.</p>
+<p>Arguments: <code>Graph name</code></p>
+<p>Returns: <code>Null</code></p>
+<div class="codehilite"><pre><span></span>GRAPH.DELETE us_government
 </pre></div>
 
 
-<h2 id="graphaddedge">GRAPH.ADDEDGE<a class="headerlink" href="#graphaddedge" title="Permanent link">&para;</a></h2>
-<p>Creates a connection within the given graph between source node and destination node, using relation.</p>
-<p>Arguments: <code>Graph name, source node ID, relationship, destination node ID</code></p>
-<p>Returns: <code>Edge ID</code></p>
-<div class="codehilite"><pre><span></span>GRAPH.ADDEDGE us_government Barak_Obama_Node_ID born Hawaii_Node_ID
+<h2 id="graphexplain">GRAPH.EXPLAIN<a class="headerlink" href="#graphexplain" title="Permanent link">&para;</a></h2>
+<p>Constructs a query execution plan but does not run it. Inspect this execution plan to better
+understand how your query will get executed.</p>
+<p>Arguments: <code>Graph name, Query</code></p>
+<p>Returns: <code>String representation of a query execution plan</code></p>
+<div class="codehilite"><pre><span></span>GRAPH.EXPLAIN us_government <span class="s2">&quot;MATCH (p:president)-[:born]-&gt;(h:state {name:Hawaii}) RETURN p&quot;</span>
 </pre></div>
 
 
-<!--## GRAPH.REMOVEEDGE
-
-Removes edge connecting source to destination.
-
-Arguments: `Graph name, source node ID, relationship, destination node ID`
-
-Returns: `Null`
-
-
-wzxhzdk:2
-
-
-## GRAPH.EXPLAIN
-
-Constructs a query execution plan but does not run it. Inspect this execution plan to better
-understand how your query will get executed.
-
-Arguments: `Graph name, Query`
-
-Returns: `String representation of a query execution plan`
-
-
-wzxhzdk:3
-
-
-## GRAPH.QUERY
-
-Executes the given query against a specified graph.
-
-Arguments: `Graph name, Query`
-
-Returns: `Result set`
-
-
-wzxhzdk:4
-
-
-### Query language
-
-The syntax is based on Neo4j's [openCypher](http://www.opencypher.org/) and currently only a subset of the language is supported.
-
-A query is composed of five parts:
-
-### Query structure
-
-- MATCH
-- WHERE
-- RETURN
-- ORDER BY
-- LIMIT
-
-#### MATCH
-
-Describes the relationship between queried entities, it is composed of three parts:
-
-- Source node (S)
-- Relationship [R]
-- Destination node (D)
-
-Combining the three together
-`(S)-[R]->(D)`
-
-Each graph entity node/edge can contain an alias and a label, but both can be left empty if needed.
-
-Entity structure: `alias:label {filters}` alias, label and filters are all optional.
-
-Example:
-
-
-wzxhzdk:5
-
-
-`a` is an alias for the source node, which we'll be able to refer to at different places within our query.
-
-`actor` is the label under which this node is marked.
-
-`act` is the relationship type.
-
-`m` an alias for the destination node.
-
-`movie` destination node is of "type" movie.
-
-`{title:"straight outta compton"}` requires the node's title attribute to equal "straight outta compton".
-
-As such, we're interested in actor entities which have the relation "act" with **the** entity representing the "straight outta compton" movie.
-
-It is possible to describe broader relationships by composing a multi-hop query such as:
-
-
-wzxhzdk:6
-
-
-Here we're interested in finding out who are my friends' friends.
-
-Nodes can have more than one edge coming in or out of them, for instance:
-
-
-wzxhzdk:7
-
-
-Here we're interested in knowing which of my friends have visited at least one country i've been to.
-
-
-#### WHERE
-
-This clause is not mandatory, but in order to filter results you can define predicates of two kinds:
-
-1.Compare against constant value: `alias.property operation value`
-where `value` is a primitive type (int, float, string and boolean)
-
-2.Compare between nodes properties: `alias.property operation alias.property`
-
-Supported operations:
-
-- `=`
-- `!=`
-- `<`
-- `<=`
-- `>`
-- `>=`
-
-Predicates can be combined using AND / OR. Be sure to wrap predicates within parentheses to control precedence.
-
-
-Examples:
-
-
-wzxhzdk:8
-
-
-
-wzxhzdk:9
-
-
-It is also possible to specify equality predicates within nodes and edges using the curly braces as such:
-
-
-wzxhzdk:10
-
-
-Here we've required that the president node's name will have the value "Barack Obama"
-and the won edge term property will equal 2.
-
-There's no difference between inlined predicates and predicates specified within the WHERE clause.
-
-#### RETURN
-
-In its simple form, Return defines which properties the returned result-set will contain.
-Its structure is a list of `alias.property` seperated by commas.
+<h2 id="graphquery">GRAPH.QUERY<a class="headerlink" href="#graphquery" title="Permanent link">&para;</a></h2>
+<p>Executes the given query against a specified graph.</p>
+<p>Arguments: <code>Graph name, Query</code></p>
+<p>Returns: <code>Result set</code></p>
+<div class="codehilite"><pre><span></span>GRAPH.QUERY us_government <span class="s2">&quot;MATCH (p:president)-[:born]-&gt;(:state {name:Hawaii}) RETURN p&quot;</span>
+</pre></div>
+
+
+<h3 id="query-language">Query language<a class="headerlink" href="#query-language" title="Permanent link">&para;</a></h3>
+<p>The syntax is based on <a href="http://www.opencypher.org/">openCypher</a> and currently only a subset of the language is
+supported.</p>
+<p>A query is composed of five parts:</p>
+<h3 id="query-structure">Query structure<a class="headerlink" href="#query-structure" title="Permanent link">&para;</a></h3>
+<ul>
+<li>MATCH</li>
+<li>WHERE</li>
+<li>RETURN</li>
+<li>ORDER BY</li>
+<li>LIMIT</li>
+<li>CREATE</li>
+</ul>
+<h4 id="match">MATCH<a class="headerlink" href="#match" title="Permanent link">&para;</a></h4>
+<p>Describes the relationship between queried entities, it is composed of three parts:</p>
+<ul>
+<li>Source node (S)</li>
+<li>Relationship [R]</li>
+<li>Destination node (D)</li>
+</ul>
+<p>Combining the three together
+<code>(S)-[R]-&gt;(D)</code></p>
+<p>Each graph entity node/edge can contain an alias and a label, but both can be left empty if needed.</p>
+<p>Entity structure: <code>alias:label {filters}</code> alias, label and filters are all optional.</p>
+<p>Example:</p>
+<div class="codehilite"><pre><span></span><span class="o">(</span>a:actor<span class="o">)</span>-<span class="o">[</span>:act<span class="o">]</span>-&gt;<span class="o">(</span>m:movie <span class="o">{</span>title:<span class="s2">&quot;straight outta compton&quot;</span><span class="o">})</span>
+</pre></div>
+
+
+<p><code>a</code> is an alias for the source node, which we'll be able to refer to at different places within our query.</p>
+<p><code>actor</code> is the label under which this node is marked.</p>
+<p><code>act</code> is the relationship type.</p>
+<p><code>m</code> an alias for the destination node.</p>
+<p><code>movie</code> destination node is of "type" movie.</p>
+<p><code>{title:"straight outta compton"}</code> requires the node's title attribute to equal "straight outta compton".</p>
+<p>As such, we're interested in actor entities which have the relation "act" with <strong>the</strong> entity representing the
+"straight outta compton" movie.</p>
+<p>It is possible to describe broader relationships by composing a multi-hop query such as:</p>
+<div class="codehilite"><pre><span></span><span class="o">(</span>me <span class="o">{</span>name:swilly<span class="o">})</span>-<span class="o">[</span>:friends_with<span class="o">]</span>-&gt;<span class="o">()</span>-<span class="o">[</span>:friends_with<span class="o">]</span>-&gt;<span class="o">(</span>fof<span class="o">)</span>
+</pre></div>
+
+
+<p>Here we're interested in finding out who are my friends' friends.</p>
+<p>Nodes can have more than one edge coming in or out of them, for instance:</p>
+<div class="codehilite"><pre><span></span><span class="o">(</span>me <span class="o">{</span>name:swilly<span class="o">})</span>-<span class="o">[</span>:visited<span class="o">]</span>-&gt;<span class="o">(</span>c:country<span class="o">)</span>&lt;-<span class="o">[</span>:visited<span class="o">]</span>-<span class="o">(</span>friend<span class="o">)</span>&lt;-<span class="o">[</span>:friends_with<span class="o">]</span>-<span class="o">({</span>name:swilly<span class="o">})</span>
+</pre></div>
+
+
+<p>Here we're interested in knowing which of my friends have visited at least one country i've been to.</p>
+<h4 id="where">WHERE<a class="headerlink" href="#where" title="Permanent link">&para;</a></h4>
+<p>This clause is not mandatory, but in order to filter results you can define predicates of two kinds:</p>
+<p>1.Compare against constant value: <code>alias.property operation value</code>
+where <code>value</code> is a primitive type (int, float, string and boolean)</p>
+<p>2.Compare between nodes properties: <code>alias.property operation alias.property</code></p>
+<p>Supported operations:</p>
+<ul>
+<li><code>=</code></li>
+<li><code>!=</code></li>
+<li><code>&lt;</code></li>
+<li><code>&lt;=</code></li>
+<li><code>&gt;</code></li>
+<li><code>&gt;=</code></li>
+</ul>
+<p>Predicates can be combined using AND / OR. Be sure to wrap predicates within parentheses to control precedence.</p>
+<p>Examples:</p>
+<div class="codehilite"><pre><span></span>WHERE <span class="o">(</span>actor.name <span class="o">=</span> <span class="s2">&quot;john doe&quot;</span> OR movie.rating &gt; <span class="m">8</span>.8<span class="o">)</span> AND movie.votes &lt;<span class="o">=</span> <span class="m">250</span><span class="o">)</span>
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span>WHERE actor.age &gt;<span class="o">=</span> director.age AND actor.age &gt; <span class="m">32</span>
+</pre></div>
+
+
+<p>It is also possible to specify equality predicates within nodes and edges using the curly braces as such:</p>
+<div class="codehilite"><pre><span></span><span class="o">(</span>:president <span class="o">{</span>name:<span class="s2">&quot;Barack Obama&quot;</span><span class="o">})</span>-<span class="o">[</span>:won <span class="o">{</span>term:2<span class="o">}]</span>-&gt;<span class="o">(</span>:state<span class="o">)</span>
+</pre></div>
+
+
+<p>Here we've required that the president node's name will have the value "Barack Obama"
+and the won edge term property will equal 2.</p>
+<p>There's no difference between inlined predicates and predicates specified within the WHERE clause.</p>
+<h4 id="return">RETURN<a class="headerlink" href="#return" title="Permanent link">&para;</a></h4>
+<p>In its simple form, Return defines which properties the returned result-set will contain.
+Its structure is a list of <code>alias.property</code> seperated by commas.
 For convenience, it's possible to specify the alias only when you're interested in every attribute an entity possesses,
-and don't want to specify each attribute individually. e.g.
+and don't want to specify each attribute individually. e.g.</p>
+<div class="codehilite"><pre><span></span>RETURN movie.title, actor
+</pre></div>
 
 
-wzxhzdk:11
+<p>Use the DISTINCT keyword to remove duplications within the result-set:</p>
+<div class="codehilite"><pre><span></span>RETURN DISTINCT friend_of_friend.name
+</pre></div>
 
 
-Use the DISTINCT keyword to remove duplications within the result-set:
-
-
-wzxhzdk:12
-
-
-In the above example, suppose we have two friends, Joe and Miesha,
+<p>In the above example, suppose we have two friends, Joe and Miesha,
 and both know Dominick. Then DISTINCT will make sure that Dominick will only appear once
-in the final result-set.
+in the final result-set.</p>
+<p>Return can also be used to aggregate data similar to SQL group by. Once an aggregation function is added to the return
+list, all other "none" aggregated values are considered as group keys, for example:</p>
+<div class="codehilite"><pre><span></span>RETURN movie.title, MAX<span class="o">(</span>actor.age<span class="o">)</span>, MIN<span class="o">(</span>actor.age<span class="o">)</span>
+</pre></div>
 
 
-Return can also be used to aggregate data similar to SQL group by. Once an aggregation function is added to the return list, all other "none" aggregated values are considered as group keys, for example:
+<p>Here we group data by movie title and for each movie, we find its youngest and oldest actor age.</p>
+<h4 id="aggregations">Aggregations<a class="headerlink" href="#aggregations" title="Permanent link">&para;</a></h4>
+<p>Supported aggregation functions:</p>
+<ul>
+<li><code>sum</code></li>
+<li><code>avg</code></li>
+<li><code>min</code></li>
+<li><code>max</code></li>
+<li><code>count</code></li>
+</ul>
+<h3 id="order-by">ORDER BY<a class="headerlink" href="#order-by" title="Permanent link">&para;</a></h3>
+<p>Specifies that the output should be sorted and how.</p>
+<p>You can order by multiple properties by stating each variable in the ORDER BY clause.
+The result will be sorted by the first variable listed, and for equal values, go to the next property in the ORDER BY
+clause, and so on.</p>
+<div class="codehilite"><pre><span></span>ORDER BY &lt;alias.property list&gt; <span class="o">[</span>ASC/DESC<span class="o">]</span>
+</pre></div>
 
 
-wzxhzdk:13
+<p>Below we sort our friends by height. For similar heights, weight is used to break even.</p>
+<div class="codehilite"><pre><span></span>ORDER BY friend.height, friend.weight DESC
+</pre></div>
 
 
-Here we group data by movie title and for each movie, we find its youngest and oldest actor age.
-
-#### Aggregations
-
-Supported aggregation functions:
-
-- `sum`
-- `avg`
-- `min`
-- `max`
-- `count`
-
-### ORDER BY
-
-Specifies that the output should be sorted and how.
-
-You can order by multiple properties by stating each variable in the ORDER BY clause.
-The result will be sorted by the first variable listed, and for equal values, go to the next property in the ORDER BY clause, and so on.
+<h3 id="limit">LIMIT<a class="headerlink" href="#limit" title="Permanent link">&para;</a></h3>
+<p>Although not mandatory, in order to limit the number of records returned by a query, you can
+use the limit clause:</p>
+<div class="codehilite"><pre><span></span>LIMIT &lt;max records to <span class="k">return</span>&gt;
+</pre></div>
 
 
-wzxhzdk:14
+<p>If not specified, there's no limit to the number of records returned by a query.</p>
+<h4 id="create">CREATE<a class="headerlink" href="#create" title="Permanent link">&para;</a></h4>
+<p>CREATE query is used to introduce new nodes and relationships.
+The simplest example of CREATE would be a single node creation:</p>
+<div class="codehilite"><pre><span></span>CREATE <span class="o">(</span>n<span class="o">)</span>
+</pre></div>
 
 
-Below we sort our friends by height. For similar heights, weight is used to break even.
+<p>It's possible to create multiple entities by seperating them with a comma.</p>
+<div class="codehilite"><pre><span></span>CREATE <span class="o">(</span>n<span class="o">)</span>,<span class="o">(</span>m<span class="o">)</span>
+</pre></div>
 
 
-wzxhzdk:15
+<p>Label and properties can be specified at creation time</p>
+<div class="codehilite"><pre><span></span>CREATE <span class="o">(</span>:person <span class="o">{</span>name: Kurt, age:27<span class="o">})</span>
+</pre></div>
 
 
-### LIMIT
+<p>Adding relations between nodes, in the following example we first locate an existing source node,
+once found we create a new relationship and destination node.</p>
+<div class="codehilite"><pre><span></span>MATCH<span class="o">(</span>a:person<span class="o">)</span>
+WHEREE a.name <span class="o">=</span> <span class="s1">&#39;Kurt&#39;</span>
+CREATE <span class="o">(</span>a<span class="o">)</span>-<span class="o">[</span>member <span class="o">{</span>position:<span class="s2">&quot;lead singer&quot;</span><span class="o">}]</span>-&gt;<span class="o">(</span>:band <span class="o">{</span>name:nirvana<span class="o">})</span>
+RETURN
+</pre></div>
 
-Although not mandatory, in order to limit the number of records returned by a query, you can
-use the limit clause:
+
+<p>Here the source node is a bounded node while the destination node is unbounded,
+as a result a new node is created representing the band nirvana and a new relation connects kurt as the lead singer of the band.</p>
+<p>Lastly we'll create a complete pattern, all entities within the pattern which are not bounded will be created.</p>
+<div class="codehilite"><pre><span></span>CREATE 
+<span class="o">(</span>jim:person<span class="o">{</span>name:<span class="s1">&#39;jim&#39;</span>, age:29<span class="o">})</span>-<span class="o">[</span>friends<span class="o">]</span>-&gt;<span class="o">(</span>pam:person <span class="o">{</span>name:<span class="s1">&#39;pam&#39;</span>, age:27<span class="o">})</span>-<span class="o">[</span>works<span class="o">]</span>-&gt;<span class="o">(</span>:employer <span class="o">{</span>name:<span class="s1">&#39;dunder mifflin&#39;</span><span class="o">})</span>
+RETURN
+</pre></div>
 
 
-wzxhzdk:16
-
-
-If not specified, there's no limit to the number of records returned by a query.
+<p>This query will create three nodes and two relationships.</p>
                 
                   
                 

@@ -446,7 +446,7 @@
 <li>A graph database implementation</li>
 <li>Nodes and edges may have attributes</li>
 <li>Nodes and edges can be labeled</li>
-<li>Supports Neo4j's <a href="http://www.opencypher.org/">openCypher</a> queries</li>
+<li>Supports <a href="http://www.opencypher.org/">openCypher</a> graph queries</li>
 </ul>
 <p>To see Redis Graph in action see <a href="https://github.com/RedisLabsModules/redis-module-graph/tree/master/Demo">Demos</a>.</p>
 <h2 id="quickstart">Quickstart<a class="headerlink" href="#quickstart" title="Permanent link">&para;</a></h2>
@@ -492,23 +492,25 @@
 
 
 <h2 id="using-redis-graph">Using Redis Graph<a class="headerlink" href="#using-redis-graph" title="Permanent link">&para;</a></h2>
-<p>Before using Redis Graph, you should familiarize yourself with its commands and syntax as detailed in the <a href="./commands">commands reference</a> document.</p>
+<p>Before using Redis Graph, you should familiarize yourself with its commands and syntax as detailed in the
+<a href="commands/">commands reference</a> document.</p>
 <p>You can call Redis Graph's commands from any Redis client.</p>
 <h3 id="with-redis-cli">With <code>redis-cli</code><a class="headerlink" href="#with-redis-cli" title="Permanent link">&para;</a></h3>
 <div class="codehilite"><pre><span></span>$ redis-cli
-<span class="m">127</span>.0.0.1:6379&gt; GRAPH.CREATENODE social person name roi age <span class="m">32</span> gender male status married
-<span class="s2">&quot;459034279876493568&quot;</span>
+<span class="m">127</span>.0.0.1:6379&gt; GRAPH.QUERY social <span class="s2">&quot;CREATE (:person {name: roi, age: 32, gender: male, status: married})&quot;</span>
 </pre></div>
 
 
 <h3 id="with-any-other-client">With any other client<a class="headerlink" href="#with-any-other-client" title="Permanent link">&para;</a></h3>
-<p>You can call the module's API using your client's ability to send raw Redis commands. Depending on your client of choice, the exact method for doing that may vary.</p>
+<p>You can call the module's API using your client's ability to send raw Redis commands. Depending on your client of
+choice, the exact method for doing that may vary.</p>
 <h4 id="python-example">Python example<a class="headerlink" href="#python-example" title="Permanent link">&para;</a></h4>
-<p>This code snippet shows how to use Redis Graph with raw Redis commands from Python with <a href="https://github.com/andymccurdy/redis-py">redis-py</a>:</p>
+<p>This code snippet shows how to use Redis Graph with raw Redis commands from Python with
+<a href="https://github.com/andymccurdy/redis-py">redis-py</a>:</p>
 <div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">redis</span>
 
 <span class="n">r</span> <span class="o">=</span> <span class="n">redis</span><span class="o">.</span><span class="n">StrictRedis</span><span class="p">()</span>
-<span class="n">reply</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">execute_command</span><span class="p">(</span><span class="s1">&#39;GRAPH.CREATENODE&#39;</span><span class="p">,</span> <span class="s1">&#39;social&#39;</span><span class="p">,</span> <span class="s1">&#39;person&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;roi&#39;</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="s1">&#39;gender&#39;</span><span class="p">,</span> <span class="s1">&#39;male&#39;</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="s1">&#39;married&#39;</span><span class="p">)</span>
+<span class="n">reply</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">execute_command</span><span class="p">(</span><span class="s1">&#39;GRAPH.QUERY&#39;</span><span class="p">,</span> <span class="s1">&#39;social&#39;</span><span class="p">,</span> <span class="s1">&#39;CREATE (:person {name:roi, age:32, gender:male, status:married)&#39;</span><span class="p">)</span>
 </pre></div>
 
 
@@ -526,11 +528,11 @@
 </thead>
 <tbody>
 <tr>
-<td>TBD</td>
+<td>redisgraph-py</td>
 <td>Python</td>
-<td>TBD</td>
+<td>BSD</td>
 <td><a href="https://redislabs.com">Redis Labs</a></td>
-<td><a href="https://github.com/swilly22/redis-module-graph/tree/master/Demo/client">GitHub</a></td>
+<td><a href="https://github.com/swilly22/redisgraph-py">GitHub</a></td>
 </tr>
 </tbody>
 </table>
