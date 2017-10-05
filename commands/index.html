@@ -221,13 +221,6 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#graphdelete" title="GRAPH.DELETE" class="md-nav__link">
-    GRAPH.DELETE
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#graphexplain" title="GRAPH.EXPLAIN" class="md-nav__link">
     GRAPH.EXPLAIN
   </a>
@@ -302,6 +295,13 @@
           <li class="md-nav__item">
   <a href="#create" title="CREATE" class="md-nav__link">
     CREATE
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#delete" title="DELETE" class="md-nav__link">
+    DELETE
   </a>
   
 </li>
@@ -358,13 +358,6 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#graphdelete" title="GRAPH.DELETE" class="md-nav__link">
-    GRAPH.DELETE
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#graphexplain" title="GRAPH.EXPLAIN" class="md-nav__link">
     GRAPH.EXPLAIN
   </a>
@@ -443,6 +436,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#delete" title="DELETE" class="md-nav__link">
+    DELETE
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -469,14 +469,6 @@
                 
                 
                 <h1 id="redis-graph-commands">Redis Graph Commands<a class="headerlink" href="#redis-graph-commands" title="Permanent link">&para;</a></h1>
-<h2 id="graphdelete">GRAPH.DELETE<a class="headerlink" href="#graphdelete" title="Permanent link">&para;</a></h2>
-<p>Deletes the entire graph.</p>
-<p>Arguments: <code>Graph name</code></p>
-<p>Returns: <code>Null</code></p>
-<div class="codehilite"><pre><span></span>GRAPH.DELETE us_government
-</pre></div>
-
-
 <h2 id="graphexplain">GRAPH.EXPLAIN<a class="headerlink" href="#graphexplain" title="Permanent link">&para;</a></h2>
 <p>Constructs a query execution plan but does not run it. Inspect this execution plan to better
 understand how your query will get executed.</p>
@@ -506,6 +498,7 @@ supported.</p>
 <li>ORDER BY</li>
 <li>LIMIT</li>
 <li>CREATE</li>
+<li>DELETE</li>
 </ul>
 <h4 id="match">MATCH<a class="headerlink" href="#match" title="Permanent link">&para;</a></h4>
 <p>Describes the relationship between queried entities, it is composed of three parts:</p>
@@ -651,21 +644,37 @@ The simplest example of CREATE would be a single node creation:</p>
 once found we create a new relationship and destination node.</p>
 <div class="codehilite"><pre><span></span>MATCH<span class="o">(</span>a:person<span class="o">)</span>
 WHEREE a.name <span class="o">=</span> <span class="s1">&#39;Kurt&#39;</span>
-CREATE <span class="o">(</span>a<span class="o">)</span>-<span class="o">[</span>member <span class="o">{</span>position:<span class="s2">&quot;lead singer&quot;</span><span class="o">}]</span>-&gt;<span class="o">(</span>:band <span class="o">{</span>name:nirvana<span class="o">})</span>
+CREATE <span class="o">(</span>a<span class="o">)</span>-<span class="o">[</span>member <span class="o">{</span>position:<span class="s2">&quot;lead singer&quot;</span><span class="o">}]</span>-&gt;<span class="o">(</span>:band <span class="o">{</span>name:Nirvana<span class="o">})</span>
 RETURN
 </pre></div>
 
 
 <p>Here the source node is a bounded node while the destination node is unbounded,
-as a result a new node is created representing the band nirvana and a new relation connects kurt as the lead singer of the band.</p>
+as a result a new node is created representing the band Nirvana and a new relation connects Kurt as the lead singer of the band.</p>
 <p>Lastly we'll create a complete pattern, all entities within the pattern which are not bounded will be created.</p>
 <div class="codehilite"><pre><span></span>CREATE 
-<span class="o">(</span>jim:person<span class="o">{</span>name:<span class="s1">&#39;jim&#39;</span>, age:29<span class="o">})</span>-<span class="o">[</span>friends<span class="o">]</span>-&gt;<span class="o">(</span>pam:person <span class="o">{</span>name:<span class="s1">&#39;pam&#39;</span>, age:27<span class="o">})</span>-<span class="o">[</span>works<span class="o">]</span>-&gt;<span class="o">(</span>:employer <span class="o">{</span>name:<span class="s1">&#39;dunder mifflin&#39;</span><span class="o">})</span>
+<span class="o">(</span>jim:person<span class="o">{</span>name:<span class="s1">&#39;Jim&#39;</span>, age:29<span class="o">})</span>-<span class="o">[</span>friends<span class="o">]</span>-&gt;<span class="o">(</span>pam:person <span class="o">{</span>name:<span class="s1">&#39;Pam&#39;</span>, age:27<span class="o">})</span>-<span class="o">[</span>works<span class="o">]</span>-&gt;<span class="o">(</span>:employer <span class="o">{</span>name:<span class="s1">&#39;Dunder Mifflin&#39;</span><span class="o">})</span>
 RETURN
 </pre></div>
 
 
 <p>This query will create three nodes and two relationships.</p>
+<h4 id="delete">DELETE<a class="headerlink" href="#delete" title="Permanent link">&para;</a></h4>
+<p>DELETE query is used to remove both nodes and relationships, please remember that deleting a node will also delete
+all of its incoming and outgoing relationships.</p>
+<p>Delete a node and all of its relationships:</p>
+<div class="codehilite"><pre><span></span>MATCH <span class="o">(</span>p:person <span class="o">{</span>name:<span class="s1">&#39;Jim&#39;</span><span class="o">})</span>
+DELETE p
+</pre></div>
+
+
+<p>Delete a relationship</p>
+<div class="codehilite"><pre><span></span>MATCH <span class="o">(</span>p:person <span class="o">{</span>name:<span class="s1">&#39;Jim&#39;</span><span class="o">})</span>-<span class="o">[</span>r:friends<span class="o">]</span>-&gt;<span class="o">()</span>
+DELETE r
+</pre></div>
+
+
+<p>This query will delete all <code>friend</code> outgoing relationships from the node with the name 'Jim'.</p>
                 
                   
                 
