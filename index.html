@@ -460,33 +460,29 @@
 <p>Requirements:</p>
 <ul>
 <li>The Redis Graph repository: <code>git clone https://github.com/RedisLabsModules/redis-module-graph.git</code></li>
-<li>The build-essential and cmake packages: <code>apt-get install build-essential cmake</code></li>
+<li>The build-essential package: <code>apt-get install build-essential</code></li>
 </ul>
-<p>To build the module, run the following in the project's directory:</p>
-<div class="codehilite"><pre><span></span>cmake . <span class="o">&amp;&amp;</span> make module
-</pre></div>
-
-
-<p>Congratulations! You can find the compiled module library at <code>src/libmodule.so</code>.</p>
+<p>To build the module, run <code>make</code> in the project's directory:</p>
+<p>Congratulations! You can find the compiled module library at <code>src/redisgraph.so</code>.</p>
 <h2 id="loading-the-module-to-redis">Loading the module to Redis<a class="headerlink" href="#loading-the-module-to-redis" title="Permanent link">&para;</a></h2>
 <p>Requirements:</p>
 <ul>
 <li><a href="https://redis.io/download">Redis v4.0 or above</a></li>
 </ul>
 <p>We recommend you have Redis load the module during startup by adding the following to your redis.conf file:</p>
-<div class="codehilite"><pre><span></span>loadmodule /path/to/module/libmodule.so
+<div class="codehilite"><pre><span></span>loadmodule /path/to/module/redisgraph.so
 </pre></div>
 
 
-<p>In the line above replace <code>/path/to/module/libmodule.so</code> with the actual path to the module's library. Alternatively, you can have Redis load the module using the following command line argument syntax:</p>
-<div class="codehilite"><pre><span></span>~/$ redis-server --loadmodule /path/to/module/libmodule.so
+<p>In the line above replace <code>/path/to/module/redisgraph.so</code> with the actual path to the module's library. Alternatively, you can have Redis load the module using the following command line argument syntax:</p>
+<div class="codehilite"><pre><span></span>~/$ redis-server --loadmodule /path/to/module/redisgraph.so
 </pre></div>
 
 
 <p>Lastly, you can also use the <a href="http://redis.io/commands/module-load"><code>MODULE LOAD</code></a> command. Note, however, that <code>MODULE LOAD</code> is a dangerous command and may be blocked/deprecated in the future due to security considerations.</p>
 <p>Once the module has been loaded successfully, the Redis log should have lines similar to:</p>
 <div class="codehilite"><pre><span></span>...
-30707:M 20 Jun 02:08:12.314 * Module &#39;graph&#39; loaded from &lt;redacted&gt;/src/libmodule.so
+30707:M 20 Jun 02:08:12.314 * Module &#39;graph&#39; loaded from &lt;redacted&gt;/src/redisgraph.so
 ...
 </pre></div>
 
