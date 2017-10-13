@@ -1,0 +1,9 @@
+machine:
+  services:
+    - redis
+dependencies:
+  pre:
+     - pip install --user redis rmtest redisgraph
+test:
+  post:
+  - make test
