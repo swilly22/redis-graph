@@ -311,8 +311,36 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#functions" title="Functions" class="md-nav__link">
+    Functions
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aggregating-functions" title="Aggregating functions" class="md-nav__link">
+    Aggregating functions
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mathematical-functions" title="Mathematical functions" class="md-nav__link">
+    Mathematical functions
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#string-functions" title="String functions" class="md-nav__link">
+    String functions
+  </a>
   
 </li>
       
@@ -448,8 +476,36 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#functions" title="Functions" class="md-nav__link">
+    Functions
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aggregating-functions" title="Aggregating functions" class="md-nav__link">
+    Aggregating functions
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mathematical-functions" title="Mathematical functions" class="md-nav__link">
+    Mathematical functions
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#string-functions" title="String functions" class="md-nav__link">
+    String functions
+  </a>
   
 </li>
       
@@ -489,6 +545,10 @@ understand how your query will get executed.</p>
 <h3 id="query-language">Query language<a class="headerlink" href="#query-language" title="Permanent link">&para;</a></h3>
 <p>The syntax is based on <a href="http://www.opencypher.org/">openCypher</a> and currently only a subset of the language is
 supported.</p>
+<ol>
+<li><a href="#query-structure">Clauses</a></li>
+<li><a href="#functions">Functions</a></li>
+</ol>
 <p>A query is composed of five parts:</p>
 <h3 id="query-structure">Query structure<a class="headerlink" href="#query-structure" title="Permanent link">&para;</a></h3>
 <ul>
@@ -675,6 +735,130 @@ DELETE r
 
 
 <p>This query will delete all <code>friend</code> outgoing relationships from the node with the name 'Jim'.</p>
+<h3 id="functions">Functions<a class="headerlink" href="#functions" title="Permanent link">&para;</a></h3>
+<p>This section contains information on all supported functions from the OpenCypher query language.</p>
+<ul>
+<li><a href="#aggregating-functions">Aggregating functions</a></li>
+<li><a href="#mathematical-functions">Mathematical functions</a></li>
+<li><a href="#string-functions">String functions</a></li>
+</ul>
+<h2 id="aggregating-functions">Aggregating functions<a class="headerlink" href="#aggregating-functions" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>avg()</td>
+<td align="left">Returns the average of a set of numeric values.</td>
+</tr>
+<tr>
+<td>count()</td>
+<td align="left">Returns the number of values or rows.</td>
+</tr>
+<tr>
+<td>max()</td>
+<td align="left">Returns the maximum value in a set of values.</td>
+</tr>
+<tr>
+<td>min()</td>
+<td align="left">Returns the minimum value in a set of values.</td>
+</tr>
+<tr>
+<td>sum()</td>
+<td align="left">Returns the sum of a set of numeric values.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="mathematical-functions">Mathematical functions<a class="headerlink" href="#mathematical-functions" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>abs()</td>
+<td align="left">Returns the absolute value of a number.</td>
+</tr>
+<tr>
+<td>ceil()</td>
+<td align="left">Returns the smallest floating point number that is greater than or equal to a number and equal to</td>
+</tr>
+<tr>
+<td>floor()</td>
+<td align="left">Returns the largest floating point number that is less than or equal to a number and equal to a</td>
+</tr>
+<tr>
+<td>rand()</td>
+<td align="left">Returns a random floating point number in the range from 0 to 1; i.e. [0,1].</td>
+</tr>
+<tr>
+<td>round()</td>
+<td align="left">Returns the value of a number rounded to the nearest integer.</td>
+</tr>
+<tr>
+<td>sign()</td>
+<td align="left">Returns the signum of a number: 0 if the number is 0, -1 for any negative number, and 1 for any positive number.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="string-functions">String functions<a class="headerlink" href="#string-functions" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>left()</td>
+<td align="left">Returns a string containing the specified number of leftmost characters of the original string.</td>
+</tr>
+<tr>
+<td>lTrim()</td>
+<td align="left">Returns the original string with leading whitespace removed.</td>
+</tr>
+<tr>
+<td>reverse()</td>
+<td align="left">Returns a string in which the order of all</td>
+</tr>
+<tr>
+<td>right()</td>
+<td align="left">Returns a string containing the specified number of rightmost characters of the original string.</td>
+</tr>
+<tr>
+<td>rTrim()</td>
+<td align="left">Returns the original string with trailing whitespace removed.</td>
+</tr>
+<tr>
+<td>substring()</td>
+<td align="left">Returns a substring of the original string, beginning with a 0-based index start and length.</td>
+</tr>
+<tr>
+<td>toLower()</td>
+<td align="left">Returns the original string in lowercase.</td>
+</tr>
+<tr>
+<td>toString()</td>
+<td align="left">Converts an integer, float or boolean value to a string.</td>
+</tr>
+<tr>
+<td>toUpper()</td>
+<td align="left">Returns the original string in uppercase.</td>
+</tr>
+<tr>
+<td>trim()</td>
+<td align="left">Returns the original string with leading and trailing whitespace removed.</td>
+</tr>
+</tbody>
+</table>
                 
                   
                 
