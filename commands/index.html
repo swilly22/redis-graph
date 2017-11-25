@@ -306,6 +306,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#set" title="SET" class="md-nav__link">
+    SET
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -471,6 +478,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#set" title="SET" class="md-nav__link">
+    SET
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -559,6 +573,7 @@ supported.</p>
 <li>LIMIT</li>
 <li>CREATE</li>
 <li>DELETE</li>
+<li>SET</li>
 </ul>
 <h4 id="match">MATCH<a class="headerlink" href="#match" title="Permanent link">&para;</a></h4>
 <p>Describes the relationship between queried entities, it is composed of three parts:</p>
@@ -735,6 +750,22 @@ DELETE r
 
 
 <p>This query will delete all <code>friend</code> outgoing relationships from the node with the name 'Jim'.</p>
+<h4 id="set">SET<a class="headerlink" href="#set" title="Permanent link">&para;</a></h4>
+<p>The <code>SET</code> clause is used to update properties on nodes and relationships.</p>
+<p>To set a property on a node or relationship, use <code>SET</code>.</p>
+<p>Query.</p>
+<div class="codehilite"><pre><span></span>MATCH <span class="o">(</span>n <span class="o">{</span> name: <span class="s1">&#39;Jim&#39;</span> <span class="o">})</span> SET n.name <span class="o">=</span> <span class="s1">&#39;Bob&#39;</span>
+</pre></div>
+
+
+<p>Set multiple properties using one <code>SET</code> clause
+If you want to set multiple properties in one go, simply separate them with a comma.</p>
+<p>Query.</p>
+<div class="codehilite"><pre><span></span>MATCH <span class="o">(</span>n <span class="o">{</span> name: <span class="s1">&#39;Jim&#39;</span>, age:32 <span class="o">})</span>
+SET n.age <span class="o">=</span> <span class="m">33</span>, n.name <span class="o">=</span> <span class="s1">&#39;Bob&#39;</span>
+</pre></div>
+
+
 <h3 id="functions">Functions<a class="headerlink" href="#functions" title="Permanent link">&para;</a></h3>
 <p>This section contains information on all supported functions from the OpenCypher query language.</p>
 <ul>
