@@ -1,4 +1,5 @@
 #include "store.h"
+#include "../rmutil/util.h"
 #include "../rmutil/strings.h"
 #include "../util/triemap/triemap_type.h"
 
@@ -64,43 +65,28 @@ LabelStore *LabelStore_Get(RedisModuleCtx *ctx, LabelStoreType type, const char 
 
 /* Get all stores of given type. */
 void LabelStore_Get_ALL(RedisModuleCtx *ctx, LabelStoreType type, const char *graph, LabelStore **stores, size_t *stores_len) {
-    char *strKey;
-    LabelStore_Id(&strKey, type, graph, "*");
+    char *pattern;
+    LabelStore_Id(&pattern, type, graph, "*");
 
-    int scan_idx = 0;               /* SCAN cursor. */
-    size_t total_stores = 0;        /* Number of stoers retrieved. */
-    RedisModuleCallReply *reply;
+    size_t key_count = 128;             /* Maximum number of keys we're willing to process. */
+    RedisModuleString *str_keys[128];   /* Keys returned by SCAN. */
+
+    RMUtil_SCAN(ctx, pattern, str_keys, &key_count);
+    free(pattern);
 
     /* Consume SCAN */
-    do {
-        reply = RedisModule_Call(ctx, "SCAN", "lcc", scan_idx, "MATCH", strKey);
-
-        /* First element is the scan cursor, 0 indicates end of SCAN. */
-        RedisModuleCallReply *element = RedisModule_CallReplyArrayElement(reply, 0);
-        scan_idx = RedisModule_CallReplyInteger(element);
-
-        /* Process SCAN results. */
-        RedisModuleCallReply *scan_results = RedisModule_CallReplyArrayElement(reply, 1);
-        /* Number of elements in replay. */
-        size_t keys_count = RedisModule_CallReplyLength(scan_results);
-
-        /* Extract SCAN result elements. */
-        for(int idx = 0; idx < keys_count && *stores_len > total_stores; idx++) {
-            element = RedisModule_CallReplyArrayElement(scan_results, idx);
-            RedisModuleString *store_key = RedisModule_CreateStringFromCallReply(element);
-
+    for(int i = 0; i < key_count; i++) {
+        RedisModuleString *store_key = str_keys[i];
+        if(i < *stores_len) {
             RedisModuleKey *key = RedisModule_OpenKey(ctx, store_key, REDISMODULE_WRITE);
-            RedisModule_FreeString(ctx, store_key);
-
-            stores[total_stores] = RedisModule_ModuleTypeGetValue(key);
+            stores[i] = RedisModule_ModuleTypeGetValue(key);
             RedisModule_CloseKey(key);
-            total_stores++;
         }
-    } while(scan_idx != 0);
+        RedisModule_FreeString(ctx, store_key);
+    }
 
     /* Update number of stores fetched. */
-    *stores_len = total_stores;
-    free(strKey);
+    *stores_len = key_count;
 }
 
 int LabelStore_Cardinality(LabelStore *store) {

@@ -255,6 +255,7 @@ void ReturnClause_ExpandCollapsedNodes(RedisModuleCtx *ctx, AST_QueryExpressionN
                 TrieMapIterator *it = TrieMap_Iterate(properties, "", 0);
                 while(TrieMapIterator_Next(it, &prop, &prop_len, &ptr)) {
                     /* Create a new return element foreach property. */
+                    prop[prop_len] = 0;
                     AST_ArithmeticExpressionNode *expanded_exp =
                         New_AST_AR_EXP_VariableOperandNode(collapsed_entity->alias, prop);
 
