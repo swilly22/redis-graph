@@ -62,6 +62,47 @@ LabelStore *LabelStore_Get(RedisModuleCtx *ctx, LabelStoreType type, const char 
 	return store;
 }
 
+/* Get all stores of given type. */
+void LabelStore_Get_ALL(RedisModuleCtx *ctx, LabelStoreType type, const char *graph, LabelStore **stores, size_t *stores_len) {
+    char *strKey;
+    LabelStore_Id(&strKey, type, graph, "*");
+
+    int scan_idx = 0;               /* SCAN cursor. */
+    size_t total_stores = 0;        /* Number of stoers retrieved. */
+    RedisModuleCallReply *reply;
+
+    /* Consume SCAN */
+    do {
+        reply = RedisModule_Call(ctx, "SCAN", "lcc", scan_idx, "MATCH", strKey);
+
+        /* First element is the scan cursor, 0 indicates end of SCAN. */
+        RedisModuleCallReply *element = RedisModule_CallReplyArrayElement(reply, 0);
+        scan_idx = RedisModule_CallReplyInteger(element);
+
+        /* Process SCAN results. */
+        RedisModuleCallReply *scan_results = RedisModule_CallReplyArrayElement(reply, 1);
+        /* Number of elements in replay. */
+        size_t keys_count = RedisModule_CallReplyLength(scan_results);
+
+        /* Extract SCAN result elements. */
+        for(int idx = 0; idx < keys_count && *stores_len > total_stores; idx++) {
+            element = RedisModule_CallReplyArrayElement(scan_results, idx);
+            RedisModuleString *store_key = RedisModule_CreateStringFromCallReply(element);
+
+            RedisModuleKey *key = RedisModule_OpenKey(ctx, store_key, REDISMODULE_WRITE);
+            RedisModule_FreeString(ctx, store_key);
+
+            stores[total_stores] = RedisModule_ModuleTypeGetValue(key);
+            RedisModule_CloseKey(key);
+            total_stores++;
+        }
+    } while(scan_idx != 0);
+
+    /* Update number of stores fetched. */
+    *stores_len = total_stores;
+    free(strKey);
+}
+
 int LabelStore_Cardinality(LabelStore *store) {
     return store->items->cardinality;
 }
