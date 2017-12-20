@@ -493,7 +493,7 @@
 <p>You can call Redis Graph's commands from any Redis client.</p>
 <h3 id="with-redis-cli">With <code>redis-cli</code><a class="headerlink" href="#with-redis-cli" title="Permanent link">&para;</a></h3>
 <div class="codehilite"><pre><span></span>$ redis-cli
-<span class="m">127</span>.0.0.1:6379&gt; GRAPH.QUERY social <span class="s2">&quot;CREATE (:person {name: roi, age: 32, gender: male, status: married})&quot;</span>
+<span class="m">127</span>.0.0.1:6379&gt; GRAPH.QUERY social <span class="s2">&quot;CREATE (:person {name: &#39;roi&#39;, age: 32, gender: &#39;male&#39;, status: &#39;married&#39;})&quot;</span>
 </pre></div>
 
 
@@ -506,7 +506,7 @@ choice, the exact method for doing that may vary.</p>
 <div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">redis</span>
 
 <span class="n">r</span> <span class="o">=</span> <span class="n">redis</span><span class="o">.</span><span class="n">StrictRedis</span><span class="p">()</span>
-<span class="n">reply</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">execute_command</span><span class="p">(</span><span class="s1">&#39;GRAPH.QUERY&#39;</span><span class="p">,</span> <span class="s1">&#39;social&#39;</span><span class="p">,</span> <span class="s1">&#39;CREATE (:person {name:roi, age:32, gender:male, status:married)&#39;</span><span class="p">)</span>
+<span class="n">reply</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">execute_command</span><span class="p">(</span><span class="s1">&#39;GRAPH.QUERY&#39;</span><span class="p">,</span> <span class="s1">&#39;social&#39;</span><span class="p">,</span> <span class="s2">&quot;CREATE (:person {name:&#39;roi&#39;, age:32, gender:&#39;male&#39;, status:&#39;married&#39;)&quot;</span><span class="p">)</span>
 </pre></div>
 
 

@@ -544,7 +544,7 @@
 understand how your query will get executed.</p>
 <p>Arguments: <code>Graph name, Query</code></p>
 <p>Returns: <code>String representation of a query execution plan</code></p>
-<div class="codehilite"><pre><span></span>GRAPH.EXPLAIN us_government <span class="s2">&quot;MATCH (p:president)-[:born]-&gt;(h:state {name:Hawaii}) RETURN p&quot;</span>
+<div class="codehilite"><pre><span></span>GRAPH.EXPLAIN us_government <span class="s2">&quot;MATCH (p:president)-[:born]-&gt;(h:state {name:&#39;Hawaii&#39;}) RETURN p&quot;</span>
 </pre></div>
 
 
@@ -552,7 +552,7 @@ understand how your query will get executed.</p>
 <p>Executes the given query against a specified graph.</p>
 <p>Arguments: <code>Graph name, Query</code></p>
 <p>Returns: <code>Result set</code></p>
-<div class="codehilite"><pre><span></span>GRAPH.QUERY us_government <span class="s2">&quot;MATCH (p:president)-[:born]-&gt;(:state {name:Hawaii}) RETURN p&quot;</span>
+<div class="codehilite"><pre><span></span>GRAPH.QUERY us_government <span class="s2">&quot;MATCH (p:president)-[:born]-&gt;(:state {name:&#39;Hawaii&#39;}) RETURN p&quot;</span>
 </pre></div>
 
 
@@ -600,13 +600,13 @@ supported.</p>
 <p>As such, we're interested in actor entities which have the relation "act" with <strong>the</strong> entity representing the
 "straight outta compton" movie.</p>
 <p>It is possible to describe broader relationships by composing a multi-hop query such as:</p>
-<div class="codehilite"><pre><span></span><span class="o">(</span>me <span class="o">{</span>name:swilly<span class="o">})</span>-<span class="o">[</span>:friends_with<span class="o">]</span>-&gt;<span class="o">()</span>-<span class="o">[</span>:friends_with<span class="o">]</span>-&gt;<span class="o">(</span>fof<span class="o">)</span>
+<div class="codehilite"><pre><span></span><span class="o">(</span>me <span class="o">{</span>name:<span class="s1">&#39;swilly&#39;</span><span class="o">})</span>-<span class="o">[</span>:friends_with<span class="o">]</span>-&gt;<span class="o">()</span>-<span class="o">[</span>:friends_with<span class="o">]</span>-&gt;<span class="o">(</span>fof<span class="o">)</span>
 </pre></div>
 
 
 <p>Here we're interested in finding out who are my friends' friends.</p>
 <p>Nodes can have more than one edge coming in or out of them, for instance:</p>
-<div class="codehilite"><pre><span></span><span class="o">(</span>me <span class="o">{</span>name:swilly<span class="o">})</span>-<span class="o">[</span>:visited<span class="o">]</span>-&gt;<span class="o">(</span>c:country<span class="o">)</span>&lt;-<span class="o">[</span>:visited<span class="o">]</span>-<span class="o">(</span>friend<span class="o">)</span>&lt;-<span class="o">[</span>:friends_with<span class="o">]</span>-<span class="o">({</span>name:swilly<span class="o">})</span>
+<div class="codehilite"><pre><span></span><span class="o">(</span>me <span class="o">{</span>name:<span class="s1">&#39;swilly&#39;</span><span class="o">})</span>-<span class="o">[</span>:visited<span class="o">]</span>-&gt;<span class="o">(</span>c:country<span class="o">)</span>&lt;-<span class="o">[</span>:visited<span class="o">]</span>-<span class="o">(</span>friend<span class="o">)</span>&lt;-<span class="o">[</span>:friends_with<span class="o">]</span>-<span class="o">({</span>name:<span class="s1">&#39;swilly&#39;</span><span class="o">})</span>
 </pre></div>
 
 
@@ -711,7 +711,7 @@ The simplest example of CREATE would be a single node creation:</p>
 
 
 <p>Label and properties can be specified at creation time</p>
-<div class="codehilite"><pre><span></span>CREATE <span class="o">(</span>:person <span class="o">{</span>name: Kurt, age:27<span class="o">})</span>
+<div class="codehilite"><pre><span></span>CREATE <span class="o">(</span>:person <span class="o">{</span>name: <span class="s1">&#39;Kurt&#39;</span>, age:27<span class="o">})</span>
 </pre></div>
 
 
@@ -719,7 +719,7 @@ The simplest example of CREATE would be a single node creation:</p>
 once found we create a new relationship and destination node.</p>
 <div class="codehilite"><pre><span></span>MATCH<span class="o">(</span>a:person<span class="o">)</span>
 WHEREE a.name <span class="o">=</span> <span class="s1">&#39;Kurt&#39;</span>
-CREATE <span class="o">(</span>a<span class="o">)</span>-<span class="o">[</span>member <span class="o">{</span>position:<span class="s2">&quot;lead singer&quot;</span><span class="o">}]</span>-&gt;<span class="o">(</span>:band <span class="o">{</span>name:Nirvana<span class="o">})</span>
+CREATE <span class="o">(</span>a<span class="o">)</span>-<span class="o">[</span>member <span class="o">{</span>position:<span class="s2">&quot;lead singer&quot;</span><span class="o">}]</span>-&gt;<span class="o">(</span>:band <span class="o">{</span>name:<span class="s2">&quot;Nirvana&quot;</span><span class="o">})</span>
 RETURN
 </pre></div>
 
