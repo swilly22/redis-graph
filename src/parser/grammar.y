@@ -351,13 +351,13 @@ arithmetic_expression(A) ::= variable(B). {
 
 // Vector of AST_ArithmeticExpressionNode pointers.
 %type arithmetic_expression_list {Vector*}
+arithmetic_expression_list(A) ::= arithmetic_expression_list(B) COMMA arithmetic_expression(C). {
+	Vector_Push(B, C);
+	A = B;
+}
 arithmetic_expression_list(A) ::= arithmetic_expression(B). {
 	A = NewVector(AST_ArithmeticExpressionNode*, 1);
 	Vector_Push(A, B);
-}
-arithmetic_expression_list(A) ::= arithmetic_expression(B) COMMA arithmetic_expression_list(C). {
-	Vector_Push(C, B);
-	A = C;
 }
 
 %type variable {AST_Variable*}
