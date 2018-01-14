@@ -27,7 +27,7 @@ void test_node_props() {
 
 	SIValue *val = GraphEntity_Get_Property((GraphEntity*)node, "neighborhood");
 	assert(strcmp(val->stringval.str, "rambam") == 0);
-	
+
 	val = GraphEntity_Get_Property((GraphEntity*)node, "block");
 	assert(val->intval == 10);
 
@@ -43,7 +43,7 @@ void test_node_edges() {
 	Edge *edge = NewEdge(3l, src, dest, "lands");
 
 	Node_ConnectNode(src, dest, edge);
-	
+
 	assert(Node_IncomeDegree(src) == 0);
 	assert(Node_IncomeDegree(dest) == 1);
 
@@ -54,7 +54,7 @@ void test_node_edges() {
 
 int main(int argc, char **argv) {
 	test_node_creation();
-	test_node_props();
+    test_node_props();
 	test_node_edges();
 	printf("test_node - PASS!\n");
     return 0;

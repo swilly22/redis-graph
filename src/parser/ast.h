@@ -147,7 +147,7 @@ typedef struct {
 } AST_SetNode;
 
 typedef struct {	
-	Vector *graphEntities; /* Vector of Vectors of char pointers. */
+	Vector *graphEntities; /* Vector of char pointers. */
 } AST_DeleteNode;
 
 typedef struct {
@@ -228,6 +228,9 @@ AST_Validation _Validate_CREATE_Clause(const AST_QueryExpressionNode* ast, char 
 AST_Validation _Validate_SET_Clause(const AST_QueryExpressionNode* ast, char **reason);
 AST_Validation _Validate_DELETE_Clause(const AST_QueryExpressionNode* ast, char **reason);
 AST_Validation _Validate_RETURN_Clause(const AST_QueryExpressionNode* ast, char **reason);
+AST_Validation _Validate_Aliases_In_Match_Clause(const Vector* aliasesToCheck, 
+												 const Vector* elementsToCheckAgainst, 
+												 char** undefined_alias);
 AST_Validation Validate_AST(const AST_QueryExpressionNode* ast, char **reason);
 
 void Free_AST_Variable(AST_Variable *v);
@@ -244,4 +247,5 @@ void Free_AST_ReturnElementNode(AST_ReturnElementNode *returnElementNode);
 void Free_AST_ArithmeticExpressionNode(AST_ArithmeticExpressionNode *arExpNode);
 void Free_AST_GraphEntity(AST_GraphEntity *entity);
 void Free_AST_QueryExpressionNode(AST_QueryExpressionNode *queryExpressionNode);
+void _Get_All_Aliases_From_Expression(const AST_ArithmeticExpressionNode *exp, Vector *aliases);
 #endif
