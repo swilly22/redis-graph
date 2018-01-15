@@ -10,6 +10,7 @@ AggCtx* Agg_AvgFunc();
 AggCtx* Agg_MaxFunc();
 AggCtx* Agg_MinFunc();
 AggCtx* Agg_CountFunc();
+AggCtx* Agg_PercDiscFunc();
 
 void Agg_RegisterFuncs();
 

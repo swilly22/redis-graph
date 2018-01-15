@@ -11,9 +11,8 @@
 static TrieMap *__aeRegisteredFuncs = NULL;
 
 SIValue AR_EXP_Evaluate(const AR_ExpNode *root) {
+
     SIValue result;
-    SIValue sub_trees[32];
-    
     /* Deal with Operation node. */
     if(root->type == AR_EXP_OP) {
         /* Aggregation function should be reduced by now. 
@@ -23,7 +22,7 @@ SIValue AR_EXP_Evaluate(const AR_ExpNode *root) {
             result = agg->result;
         } else {
             /* Evaluate each child before evaluating current node. */
-            /* TODO: deal with root->child_count > sizeof(sub_trees). */
+            SIValue sub_trees[root->op.child_count];
             for(int child_idx = 0; child_idx < root->op.child_count; child_idx++) {
                 sub_trees[child_idx] = AR_EXP_Evaluate(root->op.children[child_idx]);
             }
@@ -38,7 +37,7 @@ SIValue AR_EXP_Evaluate(const AR_ExpNode *root) {
             // Fetch entity property value.
             if (root->operand.variadic.entity_prop != NULL) {
                 SIValue *property = GraphEntity_Get_Property(*root->operand.variadic.entity, root->operand.variadic.entity_prop);
-               /* TODO: Handle PROPERTY_NOTFOUND. */
+                /* TODO: Handle PROPERTY_NOTFOUND. */
                 result = *property;
             } else {
                 result = SI_PtrVal(*root->operand.variadic.entity);
@@ -50,11 +49,11 @@ SIValue AR_EXP_Evaluate(const AR_ExpNode *root) {
 }
 
 void AR_EXP_Aggregate(const AR_ExpNode *root) {
-    SIValue sub_trees[32];
 
     if(root->type == AR_EXP_OP) {
         if(root->op.type == AR_OP_AGGREGATE) {
             /* Process child nodes before aggregating. */
+            SIValue sub_trees[root->op.child_count];
             int i = 0;
             for(; i < root->op.child_count; i++) {
                 AR_ExpNode *child = root->op.children[i];
@@ -63,7 +62,7 @@ void AR_EXP_Aggregate(const AR_ExpNode *root) {
 
             /* Aggregate. */
             AggCtx *agg = root->op.agg_func;
-            agg->Step(agg, sub_trees, i+1);
+            agg->Step(agg, sub_trees, root->op.child_count);
         } else {
             /* Keep searching for aggregation nodes. */
             for(int i = 0; i < root->op.child_count; i++) {

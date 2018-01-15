@@ -3,6 +3,8 @@
 #include "aggregate.h"
 #include "repository.h"
 #include "../value.h"
+#include <math.h>
+#include "../util/qsort.h"
 
 typedef struct {
     size_t num;
@@ -11,21 +13,23 @@ typedef struct {
 
 int __agg_sumStep(AggCtx *ctx, SIValue *argv, int argc) {
     // convert the value of the input sequence to a double if possible
-    double n;
-    if (!SIValue_ToDouble(&argv[0], &n)) {
-        if (!SIValue_IsNullPtr(&argv[0])) {
-            // not convertible to double!
-            return Agg_SetError(ctx,
-                                "SUM Could not convert upstream value to double");
-        } else {
-            return AGG_OK;
-        }
-    }
-    
     __agg_sumCtx *ac = Agg_FuncCtx(ctx);
 
-    ac->num++;
-    ac->total += n;
+    double n;
+    for(int i = 0; i < argc; i ++) {
+        if (!SIValue_ToDouble(&argv[i], &n)) {
+            if (!SIValue_IsNullPtr(&argv[i])) {
+                // not convertible to double!
+                return Agg_SetError(ctx,
+                                    "SUM Could not convert upstream value to double");
+            } else {
+                return AGG_OK;
+            }
+        }
+
+        ac->num++;
+        ac->total += n;
+    }
 
     return AGG_OK;
 }
@@ -53,27 +57,31 @@ typedef struct {
 
 int __agg_avgStep(AggCtx *ctx, SIValue *argv, int argc) {
     // convert the value of the input sequence to a double if possible
-    double n;
-    if (!SIValue_ToDouble(&argv[0], &n)) {
-        if (!SIValue_IsNullPtr(&argv[0])) {
-            // not convertible to double!
-            return Agg_SetError(ctx,
-                                "AVG Could not convert upstream value to double");
-        } else {
-            return AGG_OK;
-        }
-    }
-    
     __agg_avgCtx *ac = Agg_FuncCtx(ctx);
 
-    ac->count++;
-    ac->total += n;
+    double n;
+    for(int i = 0; i < argc; i ++) {
+        if (!SIValue_ToDouble(&argv[i], &n)) {
+            if (!SIValue_IsNullPtr(&argv[i])) {
+                // not convertible to double!
+                return Agg_SetError(ctx,
+                                    "AVG Could not convert upstream value to double");
+            } else {
+                return AGG_OK;
+            }
+        }
+
+
+        ac->count++;
+        ac->total += n;
+    }
 
     return AGG_OK;
 }
 
 int __agg_avgReduceNext(AggCtx *ctx) {
     __agg_avgCtx *ac = Agg_FuncCtx(ctx);
+
     if(ac->count > 0) {
         Agg_SetResult(ctx, SI_DoubleVal(ac->total / ac->count));
     } else {
@@ -98,20 +106,23 @@ typedef struct {
 
 int __agg_maxStep(AggCtx *ctx, SIValue *argv, int argc) {
     // convert the value of the input sequence to a double if possible
-    double n;
-    if (!SIValue_ToDouble(&argv[0], &n)) {
-        if (!SIValue_IsNullPtr(&argv[0])) {
-            // not convertible to double!
-            return Agg_SetError(ctx,
-                                "MAX Could not convert upstream value to double");
-        } else {
-            return AGG_OK;
-        }
-    }
-    
     __agg_maxCtx *ac = Agg_FuncCtx(ctx);
-    if(n > ac->max) {
-        ac->max = n;
+
+    double n;
+    for(int i = 0; i < argc; i ++) {
+        if (!SIValue_ToDouble(&argv[i], &n)) {
+            if (!SIValue_IsNullPtr(&argv[i])) {
+                // not convertible to double!
+                return Agg_SetError(ctx,
+                                    "MAX Could not convert upstream value to double");
+            } else {
+                return AGG_OK;
+            }
+        }
+
+        if(n > ac->max) {
+            ac->max = n;
+        }
     }
 
     return AGG_OK;
@@ -138,20 +149,23 @@ typedef struct {
 
 int __agg_minStep(AggCtx *ctx, SIValue *argv, int argc) {
     // convert the value of the input sequence to a double if possible
-    double n;
-    if (!SIValue_ToDouble(&argv[0], &n)) {
-        if (!SIValue_IsNullPtr(&argv[0])) {
-            // not convertible to double!
-            return Agg_SetError(ctx,
-                                "MIN Could not convert upstream value to double");
-        } else {
-            return AGG_OK;
-        }
-    }
-    
     __agg_minCtx *ac = Agg_FuncCtx(ctx);
-    if(n < ac->min) {
-        ac->min = n;
+
+    double n;
+    for(int i = 0; i < argc; i ++) {
+        if (!SIValue_ToDouble(&argv[i], &n)) {
+            if (!SIValue_IsNullPtr(&argv[i])) {
+                // not convertible to double!
+                return Agg_SetError(ctx,
+                                    "MIN Could not convert upstream value to double");
+            } else {
+                return AGG_OK;
+            }
+        }
+
+        if(n < ac->min) {
+            ac->min = n;
+        }
     }
 
     return AGG_OK;
@@ -177,8 +191,9 @@ typedef struct {
 } __agg_countCtx;
 
 int __agg_countStep(AggCtx *ctx, SIValue *argv, int argc) {
-    __agg_avgCtx *ac = Agg_FuncCtx(ctx);
-    ac->count++;
+    __agg_countCtx *ac = Agg_FuncCtx(ctx);
+    ac->count += argc;
+
     return AGG_OK;
 }
 
@@ -197,10 +212,84 @@ AggCtx* Agg_CountFunc() {
 
 //------------------------------------------------------------------------
 
+typedef struct {
+    double percentile;
+    double *values;
+    size_t count;
+    size_t values_allocated;
+} __agg_percCtx;
+
+// This function is agnostic as to percentile method
+int __agg_percStep(AggCtx *ctx, SIValue *argv, int argc) {
+    __agg_percCtx *ac = Agg_FuncCtx(ctx);
+
+    // The last argument is the requested percentile, which we only
+    // need to apply on the first function invocation (at which time
+    // _agg_percCtx->percentile will be -1)
+    if (ac->percentile < 0) {
+        if (!SIValue_ToDouble(&argv[argc - 1], &ac->percentile)) {
+            return Agg_SetError(ctx,
+                    "PERC_DISC Could not convert percentile argument to double");
+        }
+        if (ac->percentile < 0 || ac->percentile > 1) {
+            return Agg_SetError(ctx,
+                    "PERC_DISC Invalid input for percentile is not a valid argument, must be a number in the range 0.0 to 1.0");
+        }
+    }
+
+    if (ac->count + argc - 1 > ac->values_allocated) {
+        ac->values_allocated *= 2;
+        ac->values = realloc(ac->values, sizeof(double) * ac->values_allocated);
+    }
+
+    double n;
+    for (int i = 0; i < argc - 1; i ++) {
+        if (!SIValue_ToDouble(&argv[i], &n)) {
+            if (!SIValue_IsNullPtr(&argv[i])) {
+                // not convertible to double!
+                return Agg_SetError(ctx,
+                        "PERC_DISC Could not convert upstream value to double");
+            } else {
+                return AGG_OK;
+            }
+        }
+        ac->values[ac->count] = n;
+        ac->count++;
+    }
+
+    return AGG_OK;
+}
+
+int __agg_percDiscReduceNext(AggCtx *ctx) {
+    __agg_percCtx *ac = Agg_FuncCtx(ctx);
+
+    #define ISLT(a,b) ((*a) < (*b))
+    QSORT(double, ac->values, ac->count, ISLT);
+    // If ac->percentile == 0, employing this formula would give an index of -1
+    int idx = ac->percentile > 0 ? ceil(ac->percentile * ac->count) - 1 : 0;
+    double n = ac->values[idx];
+    Agg_SetResult(ctx, SI_DoubleVal(n));
+
+    return AGG_OK;
+}
+
+AggCtx* Agg_PercDiscFunc() {
+    __agg_percCtx *ac = malloc(sizeof(__agg_percCtx));
+    ac->count = 0;
+    ac->values = malloc(1000 * sizeof(double));
+    ac->values_allocated = 1000;
+    // Percentile will be updated by the first call to Step
+    ac->percentile = -1;
+    return Agg_Reduce(ac, __agg_percStep, __agg_percDiscReduceNext);
+}
+
+//------------------------------------------------------------------------
+
 void Agg_RegisterFuncs() {
     Agg_RegisterFunc("sum", Agg_SumFunc);
     Agg_RegisterFunc("avg", Agg_AvgFunc);
     Agg_RegisterFunc("max", Agg_MaxFunc);
     Agg_RegisterFunc("min", Agg_MinFunc);
     Agg_RegisterFunc("count", Agg_CountFunc);
+    Agg_RegisterFunc("percentileDisc", Agg_PercDiscFunc);
 }
