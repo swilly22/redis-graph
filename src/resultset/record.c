@@ -22,9 +22,7 @@ Record* Record_FromGroup(const ResultSetHeader *resultset_header, const Group *g
             AR_ExpNode *agg_exp;
             Vector_Get(g->aggregationFunctions, agg_idx, &agg_exp);
             AR_EXP_Reduce(agg_exp);
-            SIValue agg_result = AR_EXP_Evaluate(agg_exp);
-            r->values[i] = agg_result;
-
+            r->values[i] = AR_EXP_Evaluate(agg_exp);
             agg_idx++;
         } else {
             r->values[i] = g->keys[key_idx];

@@ -6,6 +6,8 @@
 #include <math.h>
 #include "../util/qsort.h"
 
+#define ISLT(a,b) ((*a) < (*b))
+
 typedef struct {
     size_t num;
     double total;
@@ -263,24 +265,149 @@ int __agg_percStep(AggCtx *ctx, SIValue *argv, int argc) {
 int __agg_percDiscReduceNext(AggCtx *ctx) {
     __agg_percCtx *ac = Agg_FuncCtx(ctx);
 
-    #define ISLT(a,b) ((*a) < (*b))
     QSORT(double, ac->values, ac->count, ISLT);
+
     // If ac->percentile == 0, employing this formula would give an index of -1
     int idx = ac->percentile > 0 ? ceil(ac->percentile * ac->count) - 1 : 0;
     double n = ac->values[idx];
     Agg_SetResult(ctx, SI_DoubleVal(n));
 
+    free(ac->values);
     return AGG_OK;
 }
 
+int __agg_percContReduceNext(AggCtx *ctx) {
+    __agg_percCtx *ac = Agg_FuncCtx(ctx);
+
+    QSORT(double, ac->values, ac->count, ISLT);
+
+    if (ac->percentile == 1.0 || ac->count == 1) {
+        Agg_SetResult(ctx, SI_DoubleVal(ac->values[ac->count - 1]));
+        free(ac->values);
+        return AGG_OK;
+    }
+
+    double int_val, fraction_val;
+    double float_idx = ac->percentile * (ac->count - 1);
+    // Split the temp value into its integer and fractional values
+    fraction_val = modf(float_idx, &int_val);
+    int index = int_val; // Casting the integral part of the value to an int for convenience
+
+    if (!fraction_val) {
+        // A valid index was requested, so we can directly return a value
+        Agg_SetResult(ctx, SI_DoubleVal(ac->values[index]));
+        free(ac->values);
+        return AGG_OK;
+    }
+
+    double lhs, rhs;
+    lhs = ac->values[index] * (1 - fraction_val);
+    rhs = ac->values[index + 1] * fraction_val;
+
+    Agg_SetResult(ctx, SI_DoubleVal(lhs + rhs));
+
+    free(ac->values);
+    return AGG_OK;
+}
+
+// The percentile initializers are identical save for the ReduceNext function they specify
 AggCtx* Agg_PercDiscFunc() {
     __agg_percCtx *ac = malloc(sizeof(__agg_percCtx));
     ac->count = 0;
-    ac->values = malloc(1000 * sizeof(double));
-    ac->values_allocated = 1000;
+    ac->values = malloc(1024 * sizeof(double));
+    ac->values_allocated = 1024;
     // Percentile will be updated by the first call to Step
     ac->percentile = -1;
     return Agg_Reduce(ac, __agg_percStep, __agg_percDiscReduceNext);
+}
+
+AggCtx* Agg_PercContFunc() {
+    __agg_percCtx *ac = malloc(sizeof(__agg_percCtx));
+    ac->count = 0;
+    ac->values = malloc(1024 * sizeof(double));
+    ac->values_allocated = 1024;
+    // Percentile will be updated by the first call to Step
+    ac->percentile = -1;
+    return Agg_Reduce(ac, __agg_percStep, __agg_percContReduceNext);
+}
+
+//------------------------------------------------------------------------
+
+typedef struct {
+    double *values;
+    double total;
+    size_t count;
+    size_t values_allocated;
+    int is_sampled;
+} __agg_stdevCtx;
+
+int __agg_StdevStep(AggCtx *ctx, SIValue *argv, int argc) {
+    __agg_stdevCtx *ac = Agg_FuncCtx(ctx);
+
+    if (ac->count + argc > ac->values_allocated) {
+        ac->values_allocated *= 2;
+        ac->values = realloc(ac->values, sizeof(double) * ac->values_allocated);
+    }
+
+    double n;
+    for (int i = 0; i < argc; i ++) {
+        if (!SIValue_ToDouble(&argv[i], &n)) {
+            if (!SIValue_IsNullPtr(&argv[i])) {
+                // not convertible to double!
+                return Agg_SetError(ctx,
+                        "STDEV Could not convert upstream value to double");
+            } else {
+                return AGG_OK;
+            }
+        }
+        ac->values[ac->count] = n;
+        ac->total += n;
+        ac->count++;
+    }
+
+    return AGG_OK;
+}
+
+int __agg_StdevReduceNext(AggCtx *ctx) {
+    __agg_stdevCtx *ac = Agg_FuncCtx(ctx);
+
+    if (ac->count < 2) {
+        Agg_SetResult(ctx, SI_DoubleVal(0));
+        free(ac->values);
+        return AGG_OK;
+    }
+
+    double mean = ac->total / ac->count;
+    long double sum = 0;
+    for (int i = 0; i < ac->count; i ++) {
+        sum += (ac->values[i] - mean) * (ac->values[i] + mean);
+    }
+    // is_sampled will be equal to 1 in the Stdev case and 0 in the StdevP case
+    double variance = sum / (ac->count - ac->is_sampled);
+    double stdev = sqrt(variance);
+
+    Agg_SetResult(ctx, SI_DoubleVal(stdev));
+
+    free(ac->values);
+    return AGG_OK;
+}
+
+AggCtx* Agg_StdevFunc() {
+    __agg_stdevCtx *ac = malloc(sizeof(__agg_stdevCtx));
+    ac->is_sampled = 1;
+    ac->count = 0;
+    ac->total = 0;
+    ac->values = malloc(1024 * sizeof(double));
+    ac->values_allocated = 1024;
+    return Agg_Reduce(ac, __agg_StdevStep, __agg_StdevReduceNext);
+}
+
+// StdevP is identical to Stdev save for an altered value we can check for with a bool
+AggCtx* Agg_StdevPFunc() {
+    AggCtx *func = Agg_StdevFunc();
+    __agg_stdevCtx *ac = Agg_FuncCtx(func);
+    ac->is_sampled = 0;
+    return func;
 }
 
 //------------------------------------------------------------------------
@@ -292,4 +419,7 @@ void Agg_RegisterFuncs() {
     Agg_RegisterFunc("min", Agg_MinFunc);
     Agg_RegisterFunc("count", Agg_CountFunc);
     Agg_RegisterFunc("percentileDisc", Agg_PercDiscFunc);
+    Agg_RegisterFunc("percentileCont", Agg_PercContFunc);
+    Agg_RegisterFunc("stDev", Agg_StdevFunc);
+    Agg_RegisterFunc("stDevP", Agg_StdevPFunc);
 }
