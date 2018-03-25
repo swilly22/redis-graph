@@ -16,8 +16,9 @@ To see Redis Graph in action see [Demos](https://github.com/RedisLabsModules/red
 ## Quickstart
 
 1. [Build the Redis Graph module library](#building-the-module)
-2. [Load Redis Graph to Redis](#loading-the-module-to-redis)
-3. [Use it from any client](#using-redis-graph)
+2. [Running tests](#running-tests)
+3. [Load Redis Graph to Redis](#loading-the-module-to-redis)
+4. [Use it from any client](#using-redis-graph)
 
 ## Building the module
 
@@ -31,6 +32,20 @@ Requirements:
 To build the module, run `make` in the project's directory:
 
 Congratulations! You can find the compiled module library at `src/redisgraph.so`.
+
+## Running tests
+
+To test RedisGraph run the followings:
+
+1. Install `python` and `pip`.
+2. Install the Redis Python client and the `rmtest` library. `pip install redis rmtest`
+
+With these in place, you should be able to execute the following in the
+`redis-graph` directory:
+
+```
+$ make test
+```
 
 ## Loading the module to Redis
 

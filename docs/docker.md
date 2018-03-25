@@ -1,7 +1,9 @@
-# Testing RedisGraph
+# Docker
 
 
 ## Using Docker
+
+### Build Docker image
 
 RedisGraph's `Dockerfile` uses a recent verion of Docker in order to take
 advantage of features such as [build stages](https://docs.docker.com/develop/develop-images/multistage-build/).
@@ -21,20 +23,9 @@ $ make docker
 As the output scrolls by, towards the end you will see the tests get run, and
 if all goes as expected, you will see them all pass.
 
+### Running within a Docker container
 
-## Native Mode
-
-If you'd like to test RedisGraph without using Docker, you will essentially
-need to duplicate what the RedisGraph `Dockerfile` does:
-
-1. Install `make` and associated build tools (on a Debian-based system
-   this is done with `apt-get install build-essential`).
-1. Install `python` and `pip`.
-1. Install the Redis Python client and the `rmtest` library.
-
-With these in place, you should be able to execute the following in the
-`redis-graph` directory:
-
+To run RedisGraph within docker simply execute:
 ```
-$ make test
+$ docker run -p 6379:6379 redislabs/redisgraph
 ```

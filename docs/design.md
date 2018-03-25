@@ -73,8 +73,8 @@ Let's execute a number of queries against our movies graph:
 Find the sum, max, min and avg age of the Straight Outta Compton cast:
 
 ```sh
-GRAPH.QUERY IMDB "MATCH (a:actor)-[act]->(m:movie {title:\"Straight Outta Compton\"})
-RETURN m.title, SUM(a.age), MAX(a.age), MIN(a.age), AVG(a.age)"
+GRAPH.QUERY IMDB 'MATCH (a:actor)-[act]->(m:movie {title:"Straight Outta Compton"})
+RETURN m.title, SUM(a.age), MAX(a.age), MIN(a.age), AVG(a.age)'
 ```
 
 RedisGraph will reply with:
@@ -90,8 +90,8 @@ Second row contains our query result.
 Let's try another query, this time we'll find in how many movies each actor played.
 
 ```sh
-GRAPH.QUERY IMDB "MATCH (actor)-[act]->(movie) RETURN actor.name, COUNT(movie.title) AS movies_count ORDER BY
-movies_count DESC"
+GRAPH.QUERY IMDB 'MATCH (actor)-[act]->(movie) RETURN actor.name, COUNT(movie.title) AS movies_count ORDER BY
+movies_count DESC'
 
 1) "actor.name, movies_count"
 2) "Aldis Hodge,2.000000"

@@ -20,6 +20,7 @@ pages:
     - 'Quickstart': index.md
     - 'Commands': commands.md
     - 'Design': design.md
+    - 'Docker': docker.md
 
 markdown_extensions:
   - admonition
