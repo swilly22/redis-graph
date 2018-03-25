@@ -592,7 +592,7 @@ command:</p>
 
 <p>Let's execute a number of queries against our movies graph:</p>
 <p>Find the sum, max, min and avg age of the Straight Outta Compton cast:</p>
-<div class="codehilite"><pre><span></span>GRAPH.QUERY IMDB <span class="s2">&quot;MATCH (a:actor)-[act]-&gt;(m:movie {title:\&quot;Straight Outta Compton\&quot;})</span>
+<div class="codehilite"><pre><span></span>GRAPH.QUERY IMDB <span class="s2">&quot;MATCH (a:actor)-[act]-&gt;(m:movie {title:&quot;</span>Straight Outta Compton<span class="s2">&quot;})</span>
 <span class="s2">RETURN m.title, SUM(a.age), MAX(a.age), MIN(a.age), AVG(a.age)&quot;</span>
 </pre></div>
 
