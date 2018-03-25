@@ -7,24 +7,26 @@
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
       
+        <link rel="canonical" href="http://redisgraph.io/docker/">
       
       
-        <link rel="shortcut icon" href="/images/favicon.png">
+      
+        <link rel="shortcut icon" href="../images/favicon.png">
       
       <meta name="generator" content="mkdocs-0.16.2, mkdocs-material-1.3.0">
     
     
       
-        <title>Redis Graph - a graph database module for Redis</title>
+        <title>Docker - Redis Graph - a graph database module for Redis</title>
       
     
     
-      <script src="/assets/javascripts/modernizr-56ade86843.js"></script>
+      <script src="../assets/javascripts/modernizr-56ade86843.js"></script>
     
     
-      <link rel="stylesheet" href="/assets/stylesheets/application-1d1da4857d.css">
+      <link rel="stylesheet" href="../assets/stylesheets/application-1d1da4857d.css">
       
-        <link rel="stylesheet" href="/assets/stylesheets/application-66fa0d9bba.palette.css">
+        <link rel="stylesheet" href="../assets/stylesheets/application-66fa0d9bba.palette.css">
       
     
     
@@ -63,8 +65,8 @@
     <div class="md-flex">
       <div class="md-flex__cell md-flex__cell--shrink">
         
-          <a href="/" title="Redis Graph - a graph database module for Redis" class="md-logo md-header-nav__button">
-            <img src="/images/logo.svg" width="24" height="24">
+          <a href=".." title="Redis Graph - a graph database module for Redis" class="md-logo md-header-nav__button">
+            <img src="../images/logo.svg" width="24" height="24">
           </a>
         
       </div>
@@ -75,7 +77,9 @@
         <span class="md-flex__ellipsis md-header-nav__title">
           
             
-            Redis Graph - a graph database module for Redis
+              
+            
+            Docker
           
         </span>
       </div>
@@ -142,7 +146,7 @@
   <label class="md-nav__title md-nav__title--site" for="drawer">
     
       <i class="md-logo md-nav__button">
-        <img src="/images/logo.svg">
+        <img src="../images/logo.svg">
       </i>
     
     Redis Graph - a graph database module for Redis
@@ -178,7 +182,7 @@
 
 
   <li class="md-nav__item">
-    <a href="/" title="Quickstart" class="md-nav__link">
+    <a href=".." title="Quickstart" class="md-nav__link">
       Quickstart
     </a>
   </li>
@@ -190,7 +194,7 @@
 
 
   <li class="md-nav__item">
-    <a href="/commands/" title="Commands" class="md-nav__link">
+    <a href="../commands/" title="Commands" class="md-nav__link">
       Commands
     </a>
   </li>
@@ -202,7 +206,7 @@
 
 
   <li class="md-nav__item">
-    <a href="/design/" title="Design" class="md-nav__link">
+    <a href="../design/" title="Design" class="md-nav__link">
       Design
     </a>
   </li>
@@ -212,11 +216,67 @@
       
       
 
+  
 
-  <li class="md-nav__item">
-    <a href="/docker/" title="Docker" class="md-nav__link">
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="toc">
+        Docker
+      </label>
+    
+    <a href="./" title="Docker" class="md-nav__link md-nav__link--active">
       Docker
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#using-docker" title="Using Docker" class="md-nav__link">
+    Using Docker
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#build-docker-image" title="Build Docker image" class="md-nav__link">
+    Build Docker image
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-within-a-docker-container" title="Running within a Docker container" class="md-nav__link">
+    Running within a Docker container
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+    </ul>
+  
+</nav>
+    
   </li>
 
     
@@ -227,12 +287,87 @@
               </div>
             
             
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#using-docker" title="Using Docker" class="md-nav__link">
+    Using Docker
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#build-docker-image" title="Build Docker image" class="md-nav__link">
+    Build Docker image
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-within-a-docker-container" title="Running within a Docker container" class="md-nav__link">
+    Running within a Docker container
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
           
           <div class="md-content">
             <article class="md-content__inner md-typeset">
               
-  <h1>404 - Not found</h1>
+                
+                
+                <h1 id="docker">Docker<a class="headerlink" href="#docker" title="Permanent link">&para;</a></h1>
+<h2 id="using-docker">Using Docker<a class="headerlink" href="#using-docker" title="Permanent link">&para;</a></h2>
+<h3 id="build-docker-image">Build Docker image<a class="headerlink" href="#build-docker-image" title="Permanent link">&para;</a></h3>
+<p>RedisGraph's <code>Dockerfile</code> uses a recent verion of Docker in order to take
+advantage of features such as <a href="https://docs.docker.com/develop/develop-images/multistage-build/">build stages</a>.
+To build RedisGraph Docker images, you will need a version of Docker equal to
+or greater than 17.05. To update the Docker on your system, see the
+<a href="https://www.docker.com/community-edition#/download">Docker update documentation</a>
+for your OS.</p>
+<p>The RedisGraph Docker build has been updated to run the tests after compiling
+the module, so running the tests with Docker is simply a matter of executing
+the following:</p>
+<div class="codehilite"><pre><span></span>$ make docker
+</pre></div>
 
+
+<p>As the output scrolls by, towards the end you will see the tests get run, and
+if all goes as expected, you will see them all pass.</p>
+<h3 id="running-within-a-docker-container">Running within a Docker container<a class="headerlink" href="#running-within-a-docker-container" title="Permanent link">&para;</a></h3>
+<p>To run RedisGraph within docker simply execute:</p>
+<div class="codehilite"><pre><span></span>$ docker run -p 6379:6379 redislabs/redisgraph
+</pre></div>
+                
+                  
+                
+              
               
                 
               
@@ -243,6 +378,27 @@
       
         
 <footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../design/" title="Design" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Design
+              </span>
+            </div>
+          </a>
+        
+        
+      </nav>
+    </div>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
@@ -273,8 +429,8 @@
       
     </div>
     
-      <script src="/assets/javascripts/application-7aa26ad9ec.js"></script>
-      <script>app.initialize({url:{base:""}})</script>
+      <script src="../assets/javascripts/application-7aa26ad9ec.js"></script>
+      <script>app.initialize({url:{base:".."}})</script>
       
     
     

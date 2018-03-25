@@ -4,7 +4,7 @@
     
     <url>
      <loc>http://redisgraph.io/</loc>
-     <lastmod>2018-03-24</lastmod>
+     <lastmod>2018-03-25</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
@@ -12,7 +12,7 @@
     
     <url>
      <loc>http://redisgraph.io/commands/</loc>
-     <lastmod>2018-03-24</lastmod>
+     <lastmod>2018-03-25</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
@@ -20,7 +20,15 @@
     
     <url>
      <loc>http://redisgraph.io/design/</loc>
-     <lastmod>2018-03-24</lastmod>
+     <lastmod>2018-03-25</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>http://redisgraph.io/docker/</loc>
+     <lastmod>2018-03-25</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
