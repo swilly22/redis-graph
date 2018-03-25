@@ -592,8 +592,8 @@ command:</p>
 
 <p>Let's execute a number of queries against our movies graph:</p>
 <p>Find the sum, max, min and avg age of the Straight Outta Compton cast:</p>
-<div class="codehilite"><pre><span></span>GRAPH.QUERY IMDB <span class="s2">&quot;MATCH (a:actor)-[act]-&gt;(m:movie {title:&quot;</span>Straight Outta Compton<span class="s2">&quot;})</span>
-<span class="s2">RETURN m.title, SUM(a.age), MAX(a.age), MIN(a.age), AVG(a.age)&quot;</span>
+<div class="codehilite"><pre><span></span>GRAPH.QUERY IMDB <span class="s1">&#39;MATCH (a:actor)-[act]-&gt;(m:movie {title:&quot;Straight Outta Compton&quot;})</span>
+<span class="s1">RETURN m.title, SUM(a.age), MAX(a.age), MIN(a.age), AVG(a.age)&#39;</span>
 </pre></div>
 
 
@@ -606,8 +606,8 @@ command:</p>
 <p>The first row is our result-set hearder which name each column according to the return clause.
 Second row contains our query result.</p>
 <p>Let's try another query, this time we'll find in how many movies each actor played.</p>
-<div class="codehilite"><pre><span></span>GRAPH.QUERY IMDB <span class="s2">&quot;MATCH (actor)-[act]-&gt;(movie) RETURN actor.name, COUNT(movie.title) AS movies_count ORDER BY</span>
-<span class="s2">movies_count DESC&quot;</span>
+<div class="codehilite"><pre><span></span>GRAPH.QUERY IMDB <span class="s1">&#39;MATCH (actor)-[act]-&gt;(movie) RETURN actor.name, COUNT(movie.title) AS movies_count ORDER BY</span>
+<span class="s1">movies_count DESC&#39;</span>
 
 <span class="m">1</span><span class="o">)</span> <span class="s2">&quot;actor.name, movies_count&quot;</span>
 <span class="m">2</span><span class="o">)</span> <span class="s2">&quot;Aldis Hodge,2.000000&quot;</span>
