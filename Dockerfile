@@ -6,7 +6,7 @@ ENV DEPS "python python-setuptools python-pip wget build-essential"
 RUN set -ex;\
     deps="$DEPS";\
     apt-get update;\
-	apt-get install -y --no-install-recommends $deps;\
+    apt-get install -y --no-install-recommends $deps;\
     pip install rmtest;\
     pip install redisgraph;
 
@@ -15,7 +15,8 @@ ADD ./ /redisgraph
 WORKDIR /redisgraph
 RUN set -ex;\
     make clean; \
-    make all -j 4;
+    make all -j 4; \
+    make test;
 
 # Package the runner
 FROM redis:latest
