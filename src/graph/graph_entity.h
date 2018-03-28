@@ -29,6 +29,8 @@ void GraphEntity_Add_Properties(GraphEntity *e, int prop_count, char **keys, SIV
  * constant value PROPERTY_NOTFOUND. */
 SIValue* GraphEntity_Get_Property(const GraphEntity *e, const char* key);
 
+void GraphEntity_Update_Property(GraphEntity *e, const char *key, SIValue *value);
+
 /* Release all memory allocated by entity */
 void FreeGraphEntity(GraphEntity *e);
 

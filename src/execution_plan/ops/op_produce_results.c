@@ -27,7 +27,7 @@ ProduceResults* NewProduceResults(RedisModuleCtx *ctx, AST_QueryExpressionNode *
     return produceResults;
 }
 
-/* Construct arithmetic expressions from return cluase. */
+/* Construct arithmetic expressions from return clause. */
 void _BuildArithmeticExpressions(ProduceResults* op, AST_ReturnNode *return_node, Graph* graph) {
     op->return_elements = NewVector(AR_ExpNode*, Vector_Size(return_node->returnElements));
 

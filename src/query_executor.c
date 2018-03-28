@@ -33,7 +33,7 @@ void BuildGraph(Graph *graph, Vector *entities) {
 
                 Vector_Get(entity->properties, prop_idx, &key);
                 Vector_Get(entity->properties, prop_idx+1, &value);
-                char *k = strdup(key->stringval.str);
+                char *k = strdup(key->stringval);
                 /* TODO: clone value. */
                 Node_Add_Properties(n, 1, &k, value);
             }
@@ -78,7 +78,7 @@ void BuildGraph(Graph *graph, Vector *entities) {
 
                 Vector_Get(entity->properties, prop_idx, &key);
                 Vector_Get(entity->properties, prop_idx+1, &value);
-                char *k = strdup(key->stringval.str);
+                char *k = strdup(key->stringval);
                 /* TODO: clone value. */
                 Edge_Add_Properties(e, 1, &k, value);
             }
@@ -185,7 +185,7 @@ void ReturnClause_ExpandCollapsedNodes(RedisModuleCtx *ctx, AST_QueryExpressionN
             exp->operand.type == AST_AR_EXP_VARIADIC &&
             exp->operand.variadic.property == NULL) {
             
-            /* Return cluase doesn't contains entity's lable,
+            /* Return clause doesn't contains entity's label,
              * Find collapsed entity's label. */
             AST_GraphEntity *collapsed_entity = NULL;
             for(int j = 0; j < Vector_Size(ast->matchNode->graphEntities); j++) {
@@ -199,7 +199,7 @@ void ReturnClause_ExpandCollapsedNodes(RedisModuleCtx *ctx, AST_QueryExpressionN
             
             /* Failed to find collapsed entity. */
             if(collapsed_entity == NULL) {
-                /* Invalud query, return clause refers to none existing entity. */
+                /* Invalid query, return clause refers to non-existent entity. */
                 /* TODO: Validate query. */
                 printf("Error, could not find collapsed entity\n");
                 return;
@@ -325,7 +325,7 @@ void inlineProperties(AST_QueryExpressionNode *ast) {
             Vector_Get(properties, j+1, &val);
 
             const char *alias = entity->alias;
-            const char *property = key->stringval.str;
+            const char *property = key->stringval;
 
             AST_FilterNode *filterNode = New_AST_ConstantPredicateNode(alias, property, EQ, *val);
             

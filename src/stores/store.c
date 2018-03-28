@@ -118,7 +118,7 @@ int LabelStore_Remove(LabelStore *store, char *id, void (*freeCB)(void *)) {
 
 LabelStoreIterator *LabelStore_Search(LabelStore *store, const char *id) {
     char* prefix_dup = strdup(id);
-	LabelStoreIterator *iter = TrieMap_Iterate(store->items, prefix_dup, strlen(prefix_dup));
+    LabelStoreIterator *iter = TrieMap_Iterate(store->items, prefix_dup, strlen(prefix_dup));
     return iter;
 }
 

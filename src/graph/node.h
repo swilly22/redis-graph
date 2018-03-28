@@ -42,7 +42,7 @@ void Node_Add_Properties(Node *node, int prop_count, char **keys, SIValue *value
  * constant value PROPERTY_NOTFOUND. */
 SIValue* Node_Get_Property(const Node *node, const char *key);
 
-/* Frees alocated space by given node. */
+/* Frees allocated space by given node. */
 void FreeNode(Node* node);
 
 #endif

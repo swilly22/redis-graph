@@ -122,11 +122,14 @@ int MGraph_Query(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     const char *graphName;
     const char *query;
     RMUtil_ParseArgs(argv, argc, 1, "cc", &graphName, &query);
-    
+
     /* Parse query, get AST. */
     char *errMsg = NULL;
-    AST_QueryExpressionNode* ast = ParseQuery(query, strlen(query), &errMsg);
-    
+
+    AST_QueryExpressionNode* ast;
+
+    ast = ParseQuery(query, strlen(query), &errMsg);
+
     if (!ast) {
         RedisModule_Log(ctx, "debug", "Error parsing query: %s", errMsg);
         RedisModule_ReplyWithError(ctx, errMsg);
@@ -142,13 +145,12 @@ int MGraph_Query(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     
     /* Modify AST */
     if(ReturnClause_ContainsCollapsedNodes(ast) == 1) {
-        /* Expend collapsed nodes. */
+        /* Expand collapsed nodes. */
         ReturnClause_ExpandCollapsedNodes(ctx, ast, graphName);
     }
 
     ExecutionPlan *plan = NewExecutionPlan(ctx, graphName, ast);
     ResultSet* resultSet = ExecutionPlan_Execute(plan);
-
     /* Send result-set back to client. */
     ExecutionPlanFree(plan);
     ResultSet_Replay(ctx, resultSet);
@@ -205,7 +207,7 @@ int MGraph_Explain(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     
     /* Modify AST */
     if(ReturnClause_ContainsCollapsedNodes(ast) == 1) {
-        /* Expend collapsed nodes. */
+        /* Expand collapsed nodes. */
         ReturnClause_ExpandCollapsedNodes(ctx, ast, graphName);
     }
 

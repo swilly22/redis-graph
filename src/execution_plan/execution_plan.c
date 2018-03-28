@@ -131,7 +131,7 @@ void _ExecutionPlan_MergeNodes(ExecutionPlan *plan, const Node *n) {
         if(current->operation->type == OPType_EXPAND_ALL) {
             ExpandAll *op = (ExpandAll*)current->operation;
             // if(Node_Compare(*(op->dest_node), n)) {
-                if(*op->dest_node == n) {
+            if(*op->dest_node == n) {
                 if(a == NULL) {
                     a = current;
                     continue;
@@ -315,7 +315,7 @@ void _Determine_Graph_Size(const AST_QueryExpressionNode *ast, size_t *node_coun
 }
 
 ExecutionPlan *NewExecutionPlan(RedisModuleCtx *ctx, const char *graph_name, AST_QueryExpressionNode *ast) {
-    /* Predetermin graph size: (entities in both MATCH and CREATE clauses)
+    /* Predetermine graph size: (entities in both MATCH and CREATE clauses)
      * have graph object maintain an entity capacity, to avoid reallocs,
      * problem was reallocs done by CREATE clause, which invalidated old refrences in ExpandAll. */
 
@@ -413,6 +413,7 @@ ExecutionPlan *NewExecutionPlan(RedisModuleCtx *ctx, const char *graph_name, AST
     Vector_Free(Ops);
 
     /* Set root operation */
+
     if(ast->deleteNode) {
         execution_plan->root->operation = NewDeleteOp(ctx, ast->deleteNode, graph,
                                                       graph_name, execution_plan->result_set);
@@ -451,7 +452,7 @@ ExecutionPlan *NewExecutionPlan(RedisModuleCtx *ctx, const char *graph_name, AST
     Vector *nodesToMerge = Graph_GetNDegreeNodes(graph, 2);
     for(int i = 0; i < Vector_Size(nodesToMerge); i++) {
         Node *nodeToMerge;
-        Vector_Get(nodesToMerge, i, & nodeToMerge);
+        Vector_Get(nodesToMerge, i, &nodeToMerge);
         _ExecutionPlan_MergeNodes(execution_plan, nodeToMerge);
     }
 

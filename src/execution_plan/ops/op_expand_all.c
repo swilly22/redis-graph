@@ -58,7 +58,7 @@ OpResult ExpandAllConsume(OpBase *opBase, Graph* graph) {
         return OP_REFRESH;
     }
 
-    /* State reseted. */
+    /* State resetted. */
     if(op->state == ExpandAllResetted) {
         op->triplet->subject = *(op->src_node);
         op->triplet->predicate = *(op->relation);

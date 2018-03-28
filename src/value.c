@@ -23,15 +23,8 @@ SIValue SI_DoubleVal(double d) {
   return (SIValue){.doubleval = d, .type = T_DOUBLE};
 }
 
-inline SIString SI_WrapString(const char *s) {
-  return (SIString){(char *)s, strlen(s)};
-}
-
-SIValue SI_StringVal(SIString s) {
-  return (SIValue){.stringval = s, .type = T_STRING};
-}
-SIValue SI_StringValC(char *s) {
-  return (SIValue){.stringval = SI_WrapString(s), .type = T_STRING};
+SIValue SI_StringVal(const char *s) {
+  return (SIValue){.stringval = strdup(s), .type = T_STRING};
 }
 
 SIValue SI_BoolVal(int b) { 
@@ -58,6 +51,8 @@ SIValue SI_Clone(SIValue v) {
     return SI_FloatVal(v.floatval);
   case T_DOUBLE:
     return SI_DoubleVal(v.doubleval);
+  case T_PTR:
+    return SI_PtrVal(v.ptrval);
   case T_INF:
     return SI_InfVal();
   case T_NEGINF:
@@ -65,14 +60,6 @@ SIValue SI_Clone(SIValue v) {
   case T_NULL:
     return SI_NullVal();
   }
-}
-
-SIString SIString_Copy(SIString s) {
-  char *b = malloc(s.len + 1);
-  memcpy(b, s.str, s.len);
-
-  b[s.len] = 0;
-  return (SIString){.str = b, .len = s.len};
 }
 
 SIValue SI_InfVal() { return (SIValue){.intval = 0, .type = T_INF}; }
@@ -90,21 +77,19 @@ inline int SIValue_IsNullPtr(SIValue *v) {
 
 void SIValue_Free(SIValue *v) {
   if (v->type == T_STRING) {
-    free(v->stringval.str);
-    v->stringval.str = NULL;
-    v->stringval.len = 0;
+    free(v->stringval);
+    v->stringval = NULL;
   }
 }
 
-int _parseInt(SIValue *v, char *str, size_t len) {
+int _parseInt(SIValue *v, char *str) {
 
   errno = 0; /* To distinguish success/failure after call */
-  char *endptr = str + len;
+  char *endptr = NULL;
   long long int val = strtoll(str, &endptr, 10);
 
-  if ((errno == ERANGE && (val == LONG_MAX || val == LONG_MIN)) ||
-      (errno != 0 && val == 0)) {
-    perror("strtol");
+  if (errno == ERANGE || (errno != 0 && val == 0)) {
+    perror("strtoll");
     return 0;
   }
 
@@ -128,25 +113,26 @@ int _parseInt(SIValue *v, char *str, size_t len) {
   }
   return 1;
 }
-int _parseBool(SIValue *v, char *str, size_t len) {
 
-  if ((len == 1 && !strncmp("1", str, len)) ||
-      (len == 4 && !strncasecmp("true", str, len))) {
+int _parseBool(SIValue *v, char *str) {
+  int len = strlen(str);
+  if ((len == 1 && !strcmp("1", str)) ||
+      (len == 4 && !strcasecmp("true", str))) {
     v->boolval = 1;
     return 1;
   }
 
-  if ((len == 1 && !strncmp("0", str, len)) ||
-      (len == 5 && !strncasecmp("false", str, len))) {
+  if ((len == 1 && !strcmp("0", str)) ||
+      (len == 5 && !strcasecmp("false", str))) {
     v->boolval = 0;
     return 1;
   }
   return 0;
 }
 
-int _parseFloat(SIValue *v, char *str, size_t len) {
+int _parseFloat(SIValue *v, char *str) {
   errno = 0; /* To distinguish success/failure after call */
-  char *endptr = str + len;
+  char *endptr = NULL;
   double val = strtod(str, &endptr);
 
   /* Check for various possible errors */
@@ -169,25 +155,24 @@ int _parseFloat(SIValue *v, char *str, size_t len) {
   return 1;
 }
 
-int SI_ParseValue(SIValue *v, char *str, size_t len) {
+int SI_ParseValue(SIValue *v, char *str) {
   switch (v->type) {
 
   case T_STRING:
-    v->stringval.str = str;
-    v->stringval.len = len;
+    v->stringval = str;
 
     break;
   case T_INT32:
   case T_INT64:
   case T_UINT:
-    return _parseInt(v, str, len);
+    return _parseInt(v, str);
 
   case T_BOOL:
-    return _parseBool(v, str, len);
+    return _parseBool(v, str);
 
   case T_FLOAT:
   case T_DOUBLE:
-    return _parseFloat(v, str, len);
+    return _parseFloat(v, str);
 
   case T_NULL:
   default:
@@ -202,8 +187,8 @@ int SIValue_ToString(SIValue v, char *buf, size_t len) {
 
   switch (v.type) {
   case T_STRING:
-    // bytes_written = snprintf(buf, len, "\"%.*s\"", (int)v.stringval.len, v.stringval.str);
-    bytes_written = snprintf(buf, len, "%.*s", (int)v.stringval.len, v.stringval.str);
+    strncpy(buf, v.stringval, len);
+    bytes_written = strlen(buf);
     break;
   case T_INT32:
     bytes_written = snprintf(buf, len, "%d", v.intval);
@@ -281,7 +266,7 @@ int SI_LongVal_Cast(SIValue *v, SIType type) {
   case T_STRING: {
     char *buf = malloc(21);
     snprintf(buf, 21, "%lld", (long long)v->longval);
-    v->stringval = SI_StringValC(buf).stringval;
+    v->stringval = buf;
     break;
   }  
   default:
@@ -316,7 +301,7 @@ int SI_DoubleVal_Cast(SIValue *v, SIType type) {
   case T_STRING: {
     char *buf = malloc(256);
     snprintf(buf, 256, "%.17f", v->doubleval);
-    v->stringval = SI_StringValC(buf).stringval;
+    v->stringval = buf;
     break;
   }  
   default:
@@ -339,7 +324,7 @@ int SI_StringVal_Cast(SIValue *v, SIType type) {
   default: {
     SIValue tmp;
     tmp.type = type;
-    if (SI_ParseValue(&tmp, v->stringval.str, v->stringval.len)) {
+    if (SI_ParseValue(&tmp, v->stringval)) {
       *v = tmp;
       return 1;
     }
@@ -373,16 +358,14 @@ int SIValue_ToDouble(SIValue *v, double *d) {
   }
 }
 
-void SIValue_FromString(SIValue *v, char *s, size_t s_len) {
+void SIValue_FromString(SIValue *v, char *s) {
   int numeric = 1;
-  int i;
-  char c;
+  char *c;
 
-  /* Scan string, see if we can find any none numeric characters int it. */
-  for(i = 0; i < s_len; i++) {
-    c = s[i];
+  /* Scan string, see if we can find any non-numeric characters in it. */
+  for(c = s; *c != '\0'; c ++) {
     
-    if(!isdigit(c) && c != '.' && c != '-') {
+    if(!isdigit(*c) && *c != '.' && *c != '-') {
       numeric = 0;
       v->type = T_STRING;
       break;
@@ -393,34 +376,58 @@ void SIValue_FromString(SIValue *v, char *s, size_t s_len) {
     v->type = T_DOUBLE;
   }
 
-  SI_ParseValue(v, s, s_len);
+  SI_ParseValue(v, s);
 }
 
 size_t SIValue_StringConcat(SIValue* strings, unsigned int string_count, char** concat) {
   int i;
-  size_t length = 0;
-  size_t offset = 0;
+
+  size_t offset = 0, length = 0;
   /* Compute length. */
   for(i = 0; i < string_count; i++) {
     /* Element string representation bytes size, strings are 
-    * srounded by double quotes,
+    * surrounded by double quotes,
     * for all other SIValue types 32 bytes should be enough. */
-    size_t len = (strings[i].type == T_STRING) ? strings[i].stringval.len + 2 : 32;
+    size_t len = (strings[i].type == T_STRING) ? strlen(strings[i].stringval) + 2 : 32;
     length += len;
   }
 
   /* Account for delimiters and NULL terminating byte. */
   length += string_count + 1;
-  *concat = calloc(length, sizeof(char));
+  *concat = malloc(length * sizeof(char));
 
   for(i = 0; i < string_count; i++) {
-    offset += SIValue_ToString(strings[i], (*concat) + offset, length - offset);
+    offset += SIValue_ToString(strings[i], (*concat) + offset, length - offset - 1);
     (*concat)[offset++] = ',';
   }
   /* Backtrack once. */
-  offset--;
+  (*concat)[-- offset] = '\0';
 
   /* Discard last delimiter. */
-  (*concat)[offset] = 0;
   return offset;
+}
+
+void SIValue_Print(FILE *outstream, SIValue *v) {
+  switch (v->type) {
+    case T_STRING:
+      fprintf(outstream, "%s", v->stringval);
+      break;
+    case T_INT32:
+      fprintf(outstream, "%d", v->intval);
+      break;
+    case T_INT64:
+      fprintf(outstream, "%ld", v->longval);
+      break;
+    case T_UINT:
+      fprintf(outstream, "%u", v->intval);
+      break;
+    case T_FLOAT:
+      fprintf(outstream, "%lf", v->floatval);
+      break;
+    case T_DOUBLE:
+      fprintf(outstream, "%lf", v->doubleval);
+      break;
+    default:
+      break;
+  }
 }

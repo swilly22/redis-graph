@@ -120,7 +120,7 @@ friends_age_statistics_query = QueryInfo(
     query="""MATCH (ME:person {name:"Roi Lipman"})-[:friend]->(f:person)
              RETURN ME.name, count(f.name), sum(f.age), avg(f.age), min(f.age), max(f.age)""",
     description='Friends age statistics.',
-    max_run_time_ms=0.25,
+    max_run_time_ms=0.3,
     expected_result=[['Roi Lipman', '6.000000', '198.000000', '33.000000', '32.000000', '34.000000']]
 )
 

@@ -84,9 +84,21 @@ test_ast:
 	@(sh -c ./test_ast)
 .PHONY: test_ast
 
+skiplist_generic: test_skiplist_generic.o
+	$(CC) $(CFLAGS)  -o test_skiplist_generic test_skiplist_generic.o  $(DEPS) $(LDFLAGS)
+test_skiplist_generic:
+	@(sh -c ./test_skiplist_generic)
+.PHONY: test_skiplist_generic
+
+skiplist_graph: test_skiplist_graph.o
+	$(CC) $(CFLAGS)  -o test_skiplist_graph test_skiplist_graph.o  $(DEPS) $(LDFLAGS)
+test_skiplist_graph:
+	@(sh -c ./test_skiplist_graph)
+.PHONY: test_skiplist_graph
+
 all: build test
 
 
-build: agg_sum edge node graph value triplet resultset_record hexastore filter_tree arithmetic_expression aggregate_functions ast
+build: agg_sum edge node graph value triplet resultset_record hexastore filter_tree arithmetic_expression aggregate_functions ast skiplist_generic skiplist_graph
 
-test: test_agg_sum test_edge test_node test_graph test_value test_triplet test_resultset_record test_hexastore test_filter_tree test_arithmetic_expression test_aggregate_functions test_ast
+test: test_agg_sum test_edge test_node test_graph test_value test_triplet test_resultset_record test_hexastore test_filter_tree test_arithmetic_expression test_aggregate_functions test_ast test_skiplist_generic test_skiplist_graph

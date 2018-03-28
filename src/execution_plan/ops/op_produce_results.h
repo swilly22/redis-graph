@@ -5,7 +5,6 @@
 #include "../../parser/ast.h"
 #include "../../redismodule.h"
 #include "../../graph/graph.h"
-#include "../../graph/graph.h"
 #include "../../resultset/resultset.h"
 
 /* ProduceResults

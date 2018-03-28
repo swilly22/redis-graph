@@ -7,7 +7,7 @@ export CC
 # if DEBUG env var is set, we compile with "debug" cflags
 DEBUGFLAGS = -g -ggdb -O3 
 ifeq ($(DEBUG), 1)
-	DEBUGFLAGS = -g -ggdb -O0
+	DEBUGFLAGS = -g -ggdb3 -O0
 endif
 
 # Default CFLAGS
