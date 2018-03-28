@@ -39,6 +39,12 @@ int compareSI(void *p1, void *p2, void *ctx) {
       return 0;
     }
   }
+
+  // We can only compare string and numeric SIValues, so any other type
+  // (such as a pointer or NULL) should error if ever reaching here.
+  assert(0);
+
+  return 0;
 }
 
 void freeVal(void *p1) {
