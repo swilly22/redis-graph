@@ -123,12 +123,12 @@ void FreeTriplet(Triplet* triplet) {
 
 /* Returns the next triplet from the cursor
  * or NULL when cursor is depleted. */
-int TripletIterator_Next(TripletIterator* iterator, Triplet** triplet) {
-	char *key = NULL;
-	tm_len_t len = 0;
-	return TrieMapIterator_Next(iterator, &key, &len, (void**)triplet);
+int TripletIterator_Next(TripletIterator* it, Triplet** triplet) {
+	int res = raxPrefixNext(it);
+	*triplet = res ? it->data : NULL;
+	return res;
 }
 
-void TripletIterator_Free(TripletIterator* iterator) {
-	TrieMapIterator_Free(iterator);
+void TripletIterator_Free(TripletIterator* it) {
+	raxStop(it);
 }

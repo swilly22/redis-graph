@@ -15,7 +15,7 @@
 
 #include "util/prng.h"
 #include "util/snowflake.h"
-#include "util/triemap/triemap_type.h"
+#include "dep/rax/rax_type.h"
 
 #include "rmutil/util.h"
 #include "rmutil/vector.h"
@@ -51,20 +51,21 @@ int MGraph_DeleteGraph(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) 
     RMUtil_ParseArgs(argv, argc, 1, "c", &graph);
     
     LabelStore *store = LabelStore_Get(ctx, STORE_NODE, graph, NULL);
-    LabelStoreIterator *it = LabelStore_Search(store, "");
+    LabelStoreIterator it;
+    LabelStore_Scan(store, &it);
     
     char *nodeId;
-    tm_len_t nodeIdLen;
+    uint16_t nodeIdLen;
     Node *node;
 
-    while(LabelStoreIterator_Next(it, &nodeId, &nodeIdLen, (void**)&node)) {
+    while(LabelStoreIterator_Next(&it, &nodeId, &nodeIdLen, (void**)&node)) {
         RedisModuleString* strKey = RedisModule_CreateString(ctx, nodeId, nodeIdLen);
         key = RedisModule_OpenKey(ctx, strKey, REDISMODULE_WRITE);
         RedisModule_FreeString(ctx, strKey);
         RedisModule_DeleteKey(key);
         RedisModule_CloseKey(key);
     }
-    LabelStoreIterator_Free(it);
+    LabelStoreIterator_Free(&it);
     
     int storeIdLen = LabelStore_Id(&storeId, STORE_NODE, graph, NULL);
     RedisModuleString *rmStoreId = RedisModule_CreateString(ctx, storeId, storeIdLen);
@@ -78,19 +79,19 @@ int MGraph_DeleteGraph(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) 
 
     /* TODO: delete store key. */
     store = LabelStore_Get(ctx, STORE_EDGE, graph, NULL);
-    it = LabelStore_Search(store, "");
+    LabelStore_Scan(store, &it);
     char *edgeId;
-    tm_len_t edgeIdLen;
+    uint16_t edgeIdLen;
     Edge *edge;
 
-    while(LabelStoreIterator_Next(it, &edgeId, &edgeIdLen, (void**)&edge)) {
+    while(LabelStoreIterator_Next(&it, &edgeId, &edgeIdLen, (void**)&edge)) {
         RedisModuleString* strKey = RedisModule_CreateString(ctx, edgeId, edgeIdLen);
         key = RedisModule_OpenKey(ctx, strKey, REDISMODULE_WRITE);
         RedisModule_FreeString(ctx, strKey);
         RedisModule_DeleteKey(key);
         RedisModule_CloseKey(key);
     }
-    LabelStoreIterator_Free(it);
+    LabelStoreIterator_Free(&it);
 
     storeIdLen = LabelStore_Id(&storeId, STORE_EDGE, graph, NULL);
     rmStoreId = RedisModule_CreateString(ctx, storeId, storeIdLen);
@@ -238,8 +239,8 @@ int RedisModule_OnLoad(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) 
         return REDISMODULE_ERR;
     }
 
-    if(TrieMapType_Register(ctx) == REDISMODULE_ERR) {
-        printf("Failed to register triemaptype\n");
+    if(RaxType_Register(ctx) == REDISMODULE_ERR) {
+        printf("Failed to register raxtype\n");
         return REDISMODULE_ERR;
     }
 

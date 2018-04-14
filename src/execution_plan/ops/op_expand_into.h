@@ -18,7 +18,7 @@ typedef struct {
     int refreshAfterPass;
     RedisModuleCtx *ctx;
     HexaStore *hexastore;
-    TripletIterator *iter;  /* Graph iterator. */
+    TripletIterator iter;  /* Graph iterator. */
 } ExpandInto;
 
 /* Creates a new ExpandInto operation */

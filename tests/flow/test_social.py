@@ -57,7 +57,7 @@ class SocialFlowTest(FlowTestsBase):
         actual_result = redis_graph.query(queries.friends_of_friends_single_and_over_30_query.query)
 
         # assert result set
-        self._assert_only_expected_resuls_are_in_actual_results(
+        self._assert_results_ignore_col_order(
             actual_result,
             queries.friends_of_friends_single_and_over_30_query)
 

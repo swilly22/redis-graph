@@ -1,13 +1,9 @@
 #include "triplet.h"
 #include "hexastore.h"
-#include "../util/triemap/triemap_type.h"
-
-void FakeFree(void* element) {
-
-}
+#include "../dep/rax/rax_type.h"
 
 HexaStore *_NewHexaStore() {
-	return NewTrieMap();
+	return raxNew();
 }
 
 HexaStore *GetHexaStore(RedisModuleCtx *ctx, const char *id) {
@@ -21,7 +17,7 @@ HexaStore *GetHexaStore(RedisModuleCtx *ctx, const char *id) {
 
 	if (type == REDISMODULE_KEYTYPE_EMPTY) {
 		hexaStore = _NewHexaStore();
-		RedisModule_ModuleTypeSetValue(key, TrieRedisModuleType, hexaStore);
+		RedisModule_ModuleTypeSetValue(key, RaxRedisModuleType, hexaStore);
 	}
 
 	hexaStore = RedisModule_ModuleTypeGetValue(key);
@@ -41,22 +37,22 @@ void HexaStore_InsertAllPerm(HexaStore* hexaStore, Triplet *t) {
 	snprintf(object, 32, "%ld", t->object->id);
 
 	tripletLength = snprintf(triplet, 128, "SPO:%s:%s:%s", subject, predicate, object);
-	TrieMap_Add(hexaStore, triplet, tripletLength, (void*)t, NULL);
+	raxInsert(hexaStore, (unsigned char *)triplet, tripletLength, (void*)t, NULL);
 
 	tripletLength = snprintf(triplet, 128, "SOP:%s:%s:%s", subject, object, predicate);
-	TrieMap_Add(hexaStore, triplet, tripletLength, (void*)t, NULL);
+	raxInsert(hexaStore, (unsigned char *)triplet, tripletLength, (void*)t, NULL);
 
 	tripletLength = snprintf(triplet, 128, "PSO:%s:%s:%s", predicate, subject, object);
-	TrieMap_Add(hexaStore, triplet, tripletLength, (void*)t, NULL);
+	raxInsert(hexaStore, (unsigned char *)triplet, tripletLength, (void*)t, NULL);
 
 	tripletLength = snprintf(triplet, 128, "POS:%s:%s:%s", predicate, object, subject);
-	TrieMap_Add(hexaStore, triplet, tripletLength, (void*)t, NULL);
+	raxInsert(hexaStore, (unsigned char *)triplet, tripletLength, (void*)t, NULL);
 
 	tripletLength = snprintf(triplet, 128, "OSP:%s:%s:%s", object, subject, predicate);
-	TrieMap_Add(hexaStore, triplet, tripletLength, (void*)t, NULL);
+	raxInsert(hexaStore, (unsigned char *)triplet, tripletLength, (void*)t, NULL);
 
 	tripletLength = snprintf(triplet, 128, "OPS:%s:%s:%s", object, predicate, subject);
-	TrieMap_Add(hexaStore, triplet, tripletLength, (void*)t, NULL);
+	raxInsert(hexaStore, (unsigned char *)triplet, tripletLength, (void*)t, NULL);
 }
 
 void HexaStore_RemoveAllPerm(HexaStore *hexaStore, const Triplet *t) {
@@ -71,31 +67,33 @@ void HexaStore_RemoveAllPerm(HexaStore *hexaStore, const Triplet *t) {
 	snprintf(object, 32, "%ld", t->object->id);
     
 	tripletLength = snprintf(triplet, 128, "SPO:%s:%s:%s", subject, predicate, object);
-	TrieMap_Delete(hexaStore, triplet, tripletLength, FakeFree);
+	raxRemove(hexaStore, (unsigned char *)triplet, tripletLength, NULL);
 
 	tripletLength = snprintf(triplet, 128, "SOP:%s:%s:%s", subject, object, predicate);
-	TrieMap_Delete(hexaStore, triplet, tripletLength, FakeFree);
+	raxRemove(hexaStore, (unsigned char *)triplet, tripletLength, NULL);
 
 	tripletLength = snprintf(triplet, 128, "PSO:%s:%s:%s", predicate, subject, object);
-	TrieMap_Delete(hexaStore, triplet, tripletLength, FakeFree);
+	raxRemove(hexaStore, (unsigned char *)triplet, tripletLength, NULL);
 
 	tripletLength = snprintf(triplet, 128, "POS:%s:%s:%s", predicate, object, subject);
-	TrieMap_Delete(hexaStore, triplet, tripletLength, FakeFree);
+	raxRemove(hexaStore, (unsigned char *)triplet, tripletLength, NULL);
 
 	tripletLength = snprintf(triplet, 128, "OSP:%s:%s:%s", object, subject, predicate);
-	TrieMap_Delete(hexaStore, triplet, tripletLength, FakeFree);
+	raxRemove(hexaStore, (unsigned char *)triplet, tripletLength, NULL);
 
 	tripletLength = snprintf(triplet, 128, "OPS:%s:%s:%s", object, predicate, subject);
-	TrieMap_Delete(hexaStore, triplet, tripletLength, (void (*)(void *))FreeTriplet);
+
+	Triplet *removedTriplet;
+	raxRemove(hexaStore, (unsigned char *)triplet, tripletLength, (void**)&removedTriplet);
+	FreeTriplet(removedTriplet);
 }
 
-// TODO: return HexaStoreIterator.
-TripletIterator *HexaStore_Search(HexaStore* hexaStore, const char *prefix) {
-	// TODO: free prefix_dup.
-	char* prefix_dup = strdup(prefix);
-	return TrieMap_Iterate(hexaStore, prefix_dup, strlen(prefix_dup));
+void HexaStore_Search(HexaStore* hexastore, const char *prefix, TripletIterator *it) {
+	raxStart(it, hexastore);
+	raxSeek(it, ">=", (unsigned char *)prefix, strlen(prefix));
 }
 
 void HexaStore_Search_Iterator(HexaStore* hexastore, sds prefix, TripletIterator *it) {
-	TrieMapIterator_Reset(it, hexastore, prefix, sdslen(prefix));
+	raxStart(it, hexastore);
+	raxSeek(it, ">=", (unsigned char *)prefix, sdslen(prefix));
 }

@@ -3,11 +3,11 @@
 
 #include "../rmutil/sds.h"
 #include "../redismodule.h"
-#include "../util/triemap/triemap.h"
+#include "../dep/rax/rax.h"
 #include "triplet.h"
 
 // TODO: find a suiteable place to store hexastores.
-typedef TrieMap HexaStore;
+typedef rax HexaStore;
 
 HexaStore *_NewHexaStore();
 
@@ -18,7 +18,7 @@ void HexaStore_InsertAllPerm(HexaStore* hexaStore, Triplet *t);
 
 void HexaStore_RemoveAllPerm(HexaStore *hexaStore, const Triplet *t);
 
-TripletIterator *HexaStore_Search(HexaStore* hexaStore, const char *prefix);
+void HexaStore_Search(HexaStore* hexaStore, const char *prefix, TripletIterator *it);
 
 void HexaStore_Search_Iterator(HexaStore* hexastore, sds prefix, TripletIterator *it);
 

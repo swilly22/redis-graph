@@ -1,9 +1,8 @@
 CFLAGS:=$(CFLAGS)
 CC_OBJECTS:=$(CC_OBJECTS)
 LIBRMUTIL=../../src/rmutil/librmutil.a
-LIBTRIEMAP=../../src/util/triemap/libtriemap.a
 
-LIBS=$(LIBTRIEMAP) $(LIBRMUTIL)
+LIBS=$(LIBRMUTIL)
 DEPS=$(CC_OBJECTS) $(LIBS)
 
 SRCDIR := $(shell pwd)

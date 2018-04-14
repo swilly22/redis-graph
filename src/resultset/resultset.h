@@ -7,7 +7,7 @@
 #include "../redismodule.h"
 #include "../rmutil/vector.h"
 #include "../util/heap.h"
-#include "../util/triemap/triemap.h"
+#include "../dep/rax/rax.h"
 
 #define RESULTSET_UNLIMITED 0
 #define RESULTSET_OK 1
@@ -19,7 +19,7 @@
 typedef struct {
     Vector* records;            /* Vector of Records. */
     heap_t* heap;               /* Holds top n records. */
-    TrieMap* trie;              /* When using distinct, used to identify unique records. */
+    rax* trie;                  /* When using distinct, used to identify unique records. */
     AST_QueryExpressionNode* ast;
     ResultSetHeader* header;    /* Describes how records should look like. */
     int aggregated;             /* Rather or not this is an aggregated result set. */

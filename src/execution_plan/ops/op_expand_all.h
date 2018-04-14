@@ -30,7 +30,7 @@ typedef struct {
     Triplet *triplet;
     Triplet modifies;       /* Which entities does this operation modifies. */
     sds str_triplet;        /* String representation of current triplet. */
-    TripletIterator *iter;  /* Graph iterator. */
+    TripletIterator iter;   /* Graph iterator. */
     ExpandAllStates state;  /* Operation current state. */
 } ExpandAll;
 

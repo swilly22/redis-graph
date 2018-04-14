@@ -3,7 +3,7 @@
 
 #include "../redismodule.h"
 #include "../graph/graph_entity.h"
-#include "../util/triemap/triemap.h"
+#include "../dep/rax/rax.h"
 
 #define LABELSTORE_PREFIX "redis_graph_store"
 
@@ -14,16 +14,16 @@ typedef enum {
 
 /* Keeps track on label schema. */
 typedef struct {
-  TrieMap *properties;  /* Entities under this Label, have a subset of properties */
+  rax *properties;  /* Entities under this Label, have a subset of properties */
 } LabelStatistics;
 
 typedef struct {
-  TrieMap *items;
+  rax *items;
   LabelStatistics stats;
   char *label;
 } LabelStore;
 
-typedef TrieMapIterator LabelStoreIterator;
+typedef raxIterator LabelStoreIterator;
 
 /* Generates an ID for a new LabelStore. */
 int LabelStore_Id(char **id, LabelStoreType type, const char *graph, const char *label);
@@ -41,16 +41,16 @@ int LabelStore_Cardinality(LabelStore *store);
 void LabelStore_Insert(LabelStore *store, char *id, GraphEntity *entity);
 
 /* Removes entity with ID. */
-int LabelStore_Remove(LabelStore *store, char *id, void (*freeCB)(void *));
+int LabelStore_Remove(LabelStore *store, char *id);
 
-/* Searches for entity with given Id. */
-LabelStoreIterator *LabelStore_Search(LabelStore *store, const char *id);
+/* Scans through the entire store. */
+void LabelStore_Scan(LabelStore *store, LabelStoreIterator *it);
 
 /* Free store. */
-void LabelStore_Free(LabelStore *store, void (*freeCB)(void *));
+void LabelStore_Free(LabelStore *store);
 
 /* Returns the next id from cursor. */
-int LabelStoreIterator_Next(LabelStoreIterator *cursor, char **key, tm_len_t *len, void **value);
+int LabelStoreIterator_Next(LabelStoreIterator *cursor, char **key, uint16_t *len, void **value);
 
 /* Free iterator. */
 void LabelStoreIterator_Free(LabelStoreIterator* iterator);

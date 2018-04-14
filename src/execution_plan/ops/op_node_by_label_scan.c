@@ -19,7 +19,7 @@ NodeByLabelScan* NewNodeByLabelScan(RedisModuleCtx *ctx, Graph *g, Node **node,
     nodeByLabelScan->_node = *node;
     nodeByLabelScan->graph = graph_name;
     nodeByLabelScan->store = store;
-    nodeByLabelScan->iter = LabelStore_Search(store, "");
+    LabelStore_Scan(store, &nodeByLabelScan->iter);
     
 
     // Set our Op operations
@@ -38,14 +38,14 @@ NodeByLabelScan* NewNodeByLabelScan(RedisModuleCtx *ctx, Graph *g, Node **node,
 OpResult NodeByLabelScanConsume(OpBase *opBase, Graph* graph) {
     NodeByLabelScan *op = (NodeByLabelScan*)opBase;
 
-    if(op->iter == NULL) return OP_DEPLETED;
+    if(raxEOF(&op->iter)) return OP_DEPLETED;
 
     char *id;
-    tm_len_t idLen;
+    uint16_t idLen;
     
     /* Update node */
     Node **n = op->node;
-    int res = LabelStoreIterator_Next(op->iter, &id, &idLen, (void**)op->node);
+    int res = LabelStoreIterator_Next(&op->iter, &id, &idLen, (void**)op->node);
 
     if(res == 0) {
         return OP_DEPLETED;
@@ -60,18 +60,14 @@ OpResult NodeByLabelScanReset(OpBase *ctx) {
     /* Restore original node. */
     *nodeByLabelScan->node = nodeByLabelScan->_node;
     
-    if(nodeByLabelScan->iter != NULL) {
-        LabelStoreIterator_Free(nodeByLabelScan->iter);
-    }
+    LabelStoreIterator_Free(&nodeByLabelScan->iter);
     
-    nodeByLabelScan->iter = LabelStore_Search(nodeByLabelScan->store, "");
+    LabelStore_Scan(nodeByLabelScan->store, &nodeByLabelScan->iter);
     return OP_OK;
 }
 
 void NodeByLabelScanFree(OpBase *op) {
     NodeByLabelScan *nodeByLabelScan = (NodeByLabelScan*)op;
-    if(nodeByLabelScan->iter != NULL) {
-        LabelStoreIterator_Free(nodeByLabelScan->iter);
-    }
+    LabelStoreIterator_Free(&nodeByLabelScan->iter);
     free(nodeByLabelScan);
 }

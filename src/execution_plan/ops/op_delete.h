@@ -5,7 +5,7 @@
 #include "../../graph/node.h"
 #include "../../graph/edge.h"
 #include "../../resultset/resultset.h"
-#include "../../util/triemap/triemap.h"
+#include "../../dep/rax/rax.h"
 /* Delets entities specified within the DELETE clause. */
 
 typedef struct {
@@ -20,8 +20,8 @@ typedef struct {
     Edge ***edges_to_delete;
     size_t edge_count;
 
-    TrieMap *deleted_nodes;
-    TrieMap *deleted_edges;
+    rax *deleted_nodes;
+    rax *deleted_edges;
     ResultSet *result_set;
 } OpDelete;
 
