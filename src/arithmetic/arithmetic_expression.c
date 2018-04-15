@@ -1,14 +1,14 @@
-#include "arithmetic_expression.h"
-#include "./util/triemap/triemap.h"
-#include "./arithmetic/aggregate.h"
-#include "./arithmetic/repository.h"
+#include "./aggregate.h"
+#include "./repository.h"
+#include "../dep/rax/rax.h"
+#include "./arithmetic_expression.h"
 
 #include "assert.h"
 #include <math.h>
 #include <ctype.h>
 
 /* Arithmetic function repository. */
-static TrieMap *__aeRegisteredFuncs = NULL;
+static rax *__aeRegisteredFuncs = NULL;
 
 SIValue AR_EXP_Evaluate(const AR_ExpNode *root) {
 
@@ -561,18 +561,18 @@ SIValue AR_ID(SIValue *argv, int argc) {
 
 void AR_RegFunc(char *func_name, size_t func_name_len, AR_Func func) {
     if (__aeRegisteredFuncs == NULL) {
-        __aeRegisteredFuncs = NewTrieMap();
+        __aeRegisteredFuncs = raxNew();
     }
     
-    TrieMap_Add(__aeRegisteredFuncs, func_name, func_name_len, func, NULL);
+    raxInsert(__aeRegisteredFuncs, (unsigned char *)func_name, func_name_len, func, NULL);
 }
 
 AR_Func AR_GetFunc(char *func_name) {
     char lower_func_name[32] = {0};
     size_t lower_func_name_len = 32;
     _toLower(func_name, &lower_func_name[0], &lower_func_name_len);
-    void *f = TrieMap_Find(__aeRegisteredFuncs, lower_func_name, lower_func_name_len);
-    if(f != TRIEMAP_NOTFOUND) {
+    void *f = raxFind(__aeRegisteredFuncs, (unsigned char *)lower_func_name, lower_func_name_len);
+    if(f != raxNotFound) {
         return f;
     }
     return NULL;

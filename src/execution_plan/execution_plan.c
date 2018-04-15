@@ -187,7 +187,7 @@ void _ExecutionPlan_MergeNodes(ExecutionPlan *plan, const Node *n) {
 /* Returns the number of expected IDs given node will generate */
 int _ExecutionPlan_EstimateNodeCardinality(RedisModuleCtx *ctx, const char *graph, const Node *n) {
     LabelStore *s = LabelStore_Get(ctx, STORE_NODE, graph, n->label);
-    return s->items->cardinality;
+    return raxSize(s->items);
 }
 
 /* Locates expand all operations which do not have a child operation,

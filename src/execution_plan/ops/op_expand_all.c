@@ -22,8 +22,8 @@ ExpandAll* NewExpandAll(RedisModuleCtx *ctx, Graph *g, const char *graph_name,
     expand_all->hexastore = GetHexaStore(ctx, graph_name);
     expand_all->triplet = NewTriplet(NULL, NULL, NULL);
     expand_all->str_triplet = sdsempty();
-    expand_all->iter = HexaStore_Search(expand_all->hexastore, "");
     expand_all->state = ExpandAllUninitialized;
+    HexaStore_Search(expand_all->hexastore, "", &expand_all->iter);
 
     // Set our Op operations
     expand_all->op.name = "Expand All";
@@ -77,13 +77,13 @@ OpResult ExpandAllConsume(OpBase *opBase, Graph* graph) {
         TripletToString(op->triplet, &op->str_triplet);
         
         /* Search hexastore, reuse iterator. */
-        HexaStore_Search_Iterator(op->hexastore, op->str_triplet, op->iter);
+        HexaStore_Search_Iterator(op->hexastore, op->str_triplet, &op->iter);
 
         op->state = ExpandAllConsuming;
     }
     
     Triplet *triplet = NULL;
-    if(!TripletIterator_Next(op->iter, &triplet)) {
+    if(!TripletIterator_Next(&op->iter, &triplet)) {
         return OP_REFRESH;
     }
 
@@ -127,9 +127,6 @@ OpResult ExpandAllReset(OpBase *ctx) {
 /* Frees ExpandAll */
 void ExpandAllFree(OpBase *ctx) {
     ExpandAll *op = (ExpandAll*)ctx;
-    if(op->iter != NULL) {
-        TripletIterator_Free(op->iter);
-    }
     sdsfree(op->str_triplet);
     free(op);
 }

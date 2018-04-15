@@ -7,7 +7,7 @@
 
 void test_hexastore() {
     Triplet *t;
-    TripletIterator *it;
+    TripletIterator it;
     long int id;
 
     id = get_new_id();
@@ -21,53 +21,50 @@ void test_hexastore() {
 	HexaStore *hexastore = _NewHexaStore();
     assert(hexastore);
     
-    HexaStore_InsertAllPerm(hexastore,  triplet);
-    assert(hexastore->cardinality == 6);
-
-    /* Note re-introducing the same triplet will seg-fault
-     * this is because the same triplet is used six times.
-     * i.e. freed six times */
+    HexaStore_InsertAllPerm(hexastore, triplet);
+    assert(raxSize(hexastore));
 
     /* Search hexastore.
      * Scan entire hexastore. */
-    it = HexaStore_Search(hexastore, "");
-    for(int i = 0; i < 6; i++) {        
-        assert(TripletIterator_Next(it, &t));
+    HexaStore_Search(hexastore, "", &it);
+
+    for(int i = 0; i < 6; i++) {
+        assert(TripletIterator_Next(&it, &t));
         assert(t == triplet);
     }
-    assert(!TripletIterator_Next(it, &t));
+    assert(!TripletIterator_Next(&it, &t));
 
     /* Searching all possible permutations. */
-    it = HexaStore_Search(hexastore, "SPO");
-    assert(TripletIterator_Next(it, &t));
-    assert(!TripletIterator_Next(it, &t));
+    HexaStore_Search(hexastore, "SPO", &it);
+    assert(TripletIterator_Next(&it, &t));
+    assert(!TripletIterator_Next(&it, &t));
 
-    it = HexaStore_Search(hexastore, "SOP");
-    assert(TripletIterator_Next(it, &t));
-    assert(!TripletIterator_Next(it, &t));
+    HexaStore_Search(hexastore, "SOP", &it);
+    assert(TripletIterator_Next(&it, &t));
+    assert(!TripletIterator_Next(&it, &t));
 
-    it = HexaStore_Search(hexastore, "PSO");
-    assert(TripletIterator_Next(it, &t));
-    assert(!TripletIterator_Next(it, &t));
+    HexaStore_Search(hexastore, "PSO", &it);
+    assert(TripletIterator_Next(&it, &t));
+    assert(!TripletIterator_Next(&it, &t));
 
-    it = HexaStore_Search(hexastore, "POS");
-    assert(TripletIterator_Next(it, &t));
-    assert(!TripletIterator_Next(it, &t));
+    HexaStore_Search(hexastore, "POS", &it);
+    assert(TripletIterator_Next(&it, &t));
+    assert(!TripletIterator_Next(&it, &t));
 
-    it = HexaStore_Search(hexastore, "OSP");
-    assert(TripletIterator_Next(it, &t));
-    assert(!TripletIterator_Next(it, &t));
+    HexaStore_Search(hexastore, "OSP", &it);
+    assert(TripletIterator_Next(&it, &t));
+    assert(!TripletIterator_Next(&it, &t));
 
-    it = HexaStore_Search(hexastore, "OPS");
-    assert(TripletIterator_Next(it, &t));
-    assert(!TripletIterator_Next(it, &t));
+    HexaStore_Search(hexastore, "OPS", &it);
+    assert(TripletIterator_Next(&it, &t));
+    assert(!TripletIterator_Next(&it, &t));
 
     HexaStore_RemoveAllPerm(hexastore, triplet);
-    assert(hexastore->cardinality == 0);
+    assert(raxSize(hexastore) == 0);
 
     /* Searching an empty hexastore */
-    it = HexaStore_Search(hexastore, "");
-    assert(!TripletIterator_Next(it, &t));
+    HexaStore_Search(hexastore, "", &it);
+    assert(!TripletIterator_Next(&it, &t));
 }
 
 int main(int argc, char **argv) {

@@ -18,7 +18,7 @@ typedef struct {
     LabelStore *store;
     RedisModuleCtx *ctx;
     const char *graph;      /* queried graph id */
-    LabelStoreIterator *iter;
+    LabelStoreIterator iter;
 } NodeByLabelScan;
 
 /* Creates a new NodeByLabelScan operation */

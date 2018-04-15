@@ -1,21 +1,21 @@
 #include "store.h"
 #include "../rmutil/util.h"
 #include "../rmutil/strings.h"
-#include "../util/triemap/triemap_type.h"
+#include "../dep/rax/rax_type.h"
 
 /* Creates a new LabelStore. */
 LabelStore *__new_Store(const char *label) {
     LabelStore *store = calloc(1, sizeof(LabelStore));
-    store->items = NewTrieMap();
-    store->stats.properties = NewTrieMap();
+    store->items = raxNew();
+    store->stats.properties = raxNew();
     if(label) store->label = strdup(label);
 
     return store;
 }
 
-void LabelStore_Free(LabelStore *store, void (*freeCB)(void *)) {
-    TrieMap_Free(store->items, freeCB);
-    TrieMap_Free(store->stats.properties, freeCB);
+void LabelStore_Free(LabelStore *store) {
+    raxFree(store->items);
+    raxFree(store->stats.properties);
     if(store->label) free(store->label);
     free(store);
 }
@@ -55,7 +55,7 @@ LabelStore *LabelStore_Get(RedisModuleCtx *ctx, LabelStoreType type, const char 
 
 	if (RedisModule_KeyType(key) == REDISMODULE_KEYTYPE_EMPTY) {
 		store = __new_Store(label);
-		RedisModule_ModuleTypeSetValue(key, TrieRedisModuleType, store);
+		RedisModule_ModuleTypeSetValue(key, RaxRedisModuleType, store);
 	}
 
 	store = RedisModule_ModuleTypeGetValue(key);
@@ -90,11 +90,11 @@ void LabelStore_Get_ALL(RedisModuleCtx *ctx, LabelStoreType type, const char *gr
 }
 
 int LabelStore_Cardinality(LabelStore *store) {
-    return store->items->cardinality;
+    return raxSize(store->items);
 }
 
 void LabelStore_Insert(LabelStore *store, char *id, GraphEntity *entity) {
-    if (TrieMap_Add(store->items, id, strlen(id), entity, NULL)) {
+    if (raxInsert(store->items, (unsigned char *)id, strlen(id), entity, NULL)) {
         /* Entity is new to the store,
          * update store's entity schema. */
         if(store->label) {
@@ -106,26 +106,29 @@ void LabelStore_Insert(LabelStore *store, char *id, GraphEntity *entity) {
             int prop_count = entity->prop_count;
             for(int idx = 0; idx < prop_count; idx++) {
                 char *prop_name = entity->properties[idx].name;
-                TrieMap_Add(store->stats.properties, prop_name, strlen(prop_name), NULL, NULL);
+                raxInsert(store->stats.properties, (unsigned char *)prop_name, strlen(prop_name), NULL, NULL);
             }
         }
     }
 }
 
-int LabelStore_Remove(LabelStore *store, char *id, void (*freeCB)(void *)) {
-    return TrieMap_Delete(store->items, id, strlen(id), freeCB);
+int LabelStore_Remove(LabelStore *store, char *id) {
+    return raxRemove(store->items, (unsigned char *)id, strlen(id), NULL);
 }
 
-LabelStoreIterator *LabelStore_Search(LabelStore *store, const char *id) {
-    char* prefix_dup = strdup(id);
-    LabelStoreIterator *iter = TrieMap_Iterate(store->items, prefix_dup, strlen(prefix_dup));
-    return iter;
+void LabelStore_Scan(LabelStore *store, LabelStoreIterator *it) {
+    raxStart(it, store->items);
+    raxSeek(it, "^", NULL, 0);
 }
 
-int LabelStoreIterator_Next(LabelStoreIterator *cursor, char **key, tm_len_t *len, void **value) {
-    return TrieMapIterator_Next(cursor, key, len, value);
+int LabelStoreIterator_Next(LabelStoreIterator *it, char **key, uint16_t *len, void **value) {
+    int res = raxNext(it);
+    *key = (char*)it->key;
+    *len = it->key_len;
+    *value = it->data;
+    return res;
 }
 
-void LabelStoreIterator_Free(LabelStoreIterator* iterator) {
-	TrieMapIterator_Free(iterator);
+void LabelStoreIterator_Free(LabelStoreIterator* it) {
+	raxStop(it);
 }

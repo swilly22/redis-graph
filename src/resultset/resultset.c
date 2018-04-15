@@ -17,10 +17,10 @@ int _heap_elem_compare(const void * A, const void * B, const void *udata) {
  * Returns 1 if the string did not exist otherwise 0. */
 int __encounteredRecord(ResultSet* set, const Record* record) {
     char *str;
-    tm_len_t len = Record_ToString(record, &str);
+    uint16_t len = Record_ToString(record, &str);
 
     // Returns 1 if the string did NOT exist otherwise 0
-    int newRecord = TrieMap_Add(set->trie, str, len, NULL, NULL);
+    int newRecord = raxInsert(set->trie, (unsigned char *)str, len, NULL, NULL);
     free(str);
     return !newRecord;
 }
@@ -198,7 +198,7 @@ ResultSet* NewResultSet(AST_QueryExpressionNode* ast) {
     }
 
     if(set->distinct) {
-        set->trie = NewTrieMap();
+        set->trie = raxNew();
     }
 
     set->records = NewVector(Record*, set->limit);
@@ -247,10 +247,11 @@ int ResultSet_Full(const ResultSet* set) {
 void _aggregateResultSet(RedisModuleCtx* ctx, ResultSet* set) {
     char *key;
     Group *group;
-    CacheGroupIterator *iter = CacheGroupIter();
+    CacheGroupIterator iter;
+    CacheGroupIter(&iter);
 
     /* Scan entire groups cache. */
-    while(CacheGroupIterNext(iter, &key, &group) != 0) {
+    while(CacheGroupIterNext(&iter, &key, &group) != 0) {
         /* Construct response */
         Record* record = Record_FromGroup(set->header, group);
         if(ResultSet_AddRecord(set, record) == RESULTSET_FULL) {
@@ -425,8 +426,7 @@ void ResultSet_Free(RedisModuleCtx *ctx, ResultSet *set) {
         }
 
         if(set->trie != NULL) {
-            /* TODO: free trie.
-             * TrieMapNode_Free(set->trie, NULL); */
+            raxFree(set->trie);
         }
 
         ResultSetHeader_Free(set->header);

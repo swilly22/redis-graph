@@ -10,6 +10,7 @@
 #include "hexastore/triplet.h"
 #include "hexastore/hexastore.h"
 #include "parser/parser_common.h"
+#include "./dep/rax/rax.h"
 
 void BuildGraph(Graph *graph, Vector *entities) {
     /* Introduce nodes first. */
@@ -170,7 +171,7 @@ void ReturnClause_ExpandCollapsedNodes(RedisModuleCtx *ctx, AST_QueryExpressionN
      /* Create a new return clause */
     Vector *expandReturnElements = NewVector(AST_ReturnElementNode*, Vector_Size(ast->returnNode->returnElements));
 
-    /* Scan return cluase, search for collapsed nodes. */
+    /* Scan return clause, search for collapsed nodes. */
     for(int i = 0; i < Vector_Size(ast->returnNode->returnElements); i++) {
         AST_ReturnElementNode *ret_elem;
         Vector_Get(ast->returnNode->returnElements, i, &ret_elem);
@@ -207,26 +208,30 @@ void ReturnClause_ExpandCollapsedNodes(RedisModuleCtx *ctx, AST_QueryExpressionN
 
             /* Find label's properties. */
             LabelStoreType store_type = (collapsed_entity->t == N_ENTITY) ? STORE_NODE : STORE_EDGE;
-            void *ptr = NULL;       /* Label store property value, (not in use). */
-            char *prop = NULL;      /* Entity property. */
-            tm_len_t prop_len = 0;  /* Length of entity's property. */
+            unsigned char *prop = NULL;     /* Entity property. */
+            uint16_t prop_len = 0;          /* Length of entity's property. */
+            raxIterator it;
 
             /* Collapsed entity has a label. */
             if(collapsed_entity->label) {
                 LabelStore *store = LabelStore_Get(ctx, store_type, graphName, collapsed_entity->label);
-                TrieMapIterator *it = TrieMap_Iterate(store->stats.properties, "", 0);
-                while(TrieMapIterator_Next(it, &prop, &prop_len, &ptr)) {
+                raxStart(&it, store->stats.properties);
+                raxSeek(&it, "^", NULL, 0);
+                while(raxNext(&it)) {
+                    prop = it.key;
+                    prop_len = it.key_len;
+
                     prop[prop_len] = 0;
                     /* Create a new return element foreach property. */
                     AST_ArithmeticExpressionNode *expanded_exp =
-                        New_AST_AR_EXP_VariableOperandNode(collapsed_entity->alias, prop);
+                        New_AST_AR_EXP_VariableOperandNode(collapsed_entity->alias, (char*)prop);
 
                     AST_ReturnElementNode *retElem =
                         New_AST_ReturnElementNode(expanded_exp, ret_elem->alias);
 
                     Vector_Push(expandReturnElements, retElem);
                 }
-                TrieMapIterator_Free(it);
+                raxStop(&it);
             } else {
                 /* Entity does have a label.
                  * We don't have a choice but to retrieve all know properties. */
@@ -234,38 +239,43 @@ void ReturnClause_ExpandCollapsedNodes(RedisModuleCtx *ctx, AST_QueryExpressionN
                 LabelStore *stores[128];    /* Label stores. */
 
                 LabelStore_Get_ALL(ctx, store_type, graphName, stores, &stores_len);
-                TrieMap *properties = NewTrieMap(); /* Holds all properties, discards duplicates. */
+                rax *properties = raxNew(); /* Holds all properties, discards duplicates. */
 
                 /* Get properties out of label store. */
                 for(int store_idx = 0; store_idx < stores_len; store_idx++) {
                     LabelStore *s = stores[store_idx];
                     if(!s->label) continue; /* No label, (this is 'ALL' store). */
-                    TrieMapIterator *it = TrieMap_Iterate(s->stats.properties, "", 0);
-
+                    raxStart(&it, s->stats.properties);
+                    raxSeek(&it, "^", NULL, 0);
                     /* Add property to properties triemap. */
-                    while(TrieMapIterator_Next(it, &prop, &prop_len, &ptr)) {
+                    while(raxNext(&it)) {
+                        prop = it.key;
+                        prop_len = it.key_len;
                         prop[prop_len] = 0;
-                        TrieMap_Add(properties, prop, prop_len, prop, NULL);
+                        raxInsert(properties, prop, prop_len, prop, NULL);
                     }
-                    /* TODO: Free iterator. */
-                    // TrieMapIterator_Free(it);
+                    raxStop(&it);
                 }
 
-                /* Add each property to return cluase. */
-                TrieMapIterator *it = TrieMap_Iterate(properties, "", 0);
-                while(TrieMapIterator_Next(it, &prop, &prop_len, &ptr)) {
+                /* Add each property to return clause. */
+                raxStart(&it, properties);
+                raxSeek(&it, "^", NULL, 0);
+                while(raxNext(&it)) {
+                    prop = it.key;
+                    prop_len = it.key_len;
+
                     /* Create a new return element foreach property. */
                     prop[prop_len] = 0;
                     AST_ArithmeticExpressionNode *expanded_exp =
-                        New_AST_AR_EXP_VariableOperandNode(collapsed_entity->alias, prop);
+                        New_AST_AR_EXP_VariableOperandNode(collapsed_entity->alias, (char*)prop);
 
                     AST_ReturnElementNode *retElem =
                         New_AST_ReturnElementNode(expanded_exp, ret_elem->alias);
 
                     Vector_Push(expandReturnElements, retElem);
                 }
-                TrieMapIterator_Free(it);
-                TrieMap_Free(properties, TrieMap_NOP_CB);
+                raxStop(&it);
+                raxFree(properties);
             }
             /* Discard collapsed return element. */
             Free_AST_ReturnElementNode(ret_elem);

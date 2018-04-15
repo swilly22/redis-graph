@@ -17,7 +17,7 @@ AllNodeScan* NewAllNodeScan(RedisModuleCtx *ctx, Graph *g, Node **n, const char 
     allNodeScan->_node = *n;
     allNodeScan->store = store;
     allNodeScan->graph = graph_name;
-    allNodeScan->iter = LabelStore_Search(store, "");
+    LabelStore_Scan(store, &allNodeScan->iter);
 
     // Set our Op operations
     allNodeScan->op.name = "All Node Scan";
@@ -26,7 +26,7 @@ AllNodeScan* NewAllNodeScan(RedisModuleCtx *ctx, Graph *g, Node **n, const char 
     allNodeScan->op.reset = AllNodeScanReset;
     allNodeScan->op.free = AllNodeScanFree;
     allNodeScan->op.modifies = NewVector(char*, 1);
-    
+
     Vector_Push(allNodeScan->op.modifies, Graph_GetNodeAlias(g, *n));
 
     return allNodeScan;
@@ -35,14 +35,14 @@ AllNodeScan* NewAllNodeScan(RedisModuleCtx *ctx, Graph *g, Node **n, const char 
 OpResult AllNodeScanConsume(OpBase *opBase, Graph* graph) {
     AllNodeScan *op = (AllNodeScan*)opBase;
     
-    if(op->iter == NULL) {
+    if(raxEOF(&op->iter)) {
         return OP_DEPLETED;
     }
 
     char *id;
-    tm_len_t idLen;
+    uint16_t idLen;
     Node *node;
-    int res = LabelStoreIterator_Next(op->iter, &id, &idLen, (void**)&node);
+    int res = LabelStoreIterator_Next(&op->iter, &id, &idLen, (void**)&node);
     
     if(res == 0) {
         return OP_DEPLETED;
@@ -58,19 +58,14 @@ OpResult AllNodeScanReset(OpBase *op) {
     AllNodeScan *allNodeScan = (AllNodeScan*)op;
     
     *allNodeScan->node = allNodeScan->_node;
+    LabelStoreIterator_Free(&allNodeScan->iter);
 
-    if(allNodeScan->iter != NULL) {
-       LabelStoreIterator_Free(allNodeScan->iter);
-    }
-    
-    allNodeScan->iter = LabelStore_Search(allNodeScan->store, "");
+    LabelStore_Scan(allNodeScan->store, &allNodeScan->iter);
     return OP_OK;
 }
 
 void AllNodeScanFree(OpBase *ctx) {
     AllNodeScan *allNodeScan = (AllNodeScan *)ctx;
-    if(allNodeScan->iter != NULL) {
-       LabelStoreIterator_Free(allNodeScan->iter);
-    }
+    LabelStoreIterator_Free(&allNodeScan->iter);
     free(allNodeScan);
 }

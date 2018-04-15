@@ -20,8 +20,8 @@ OpDelete* _NewDeleteOp(RedisModuleCtx *ctx, AST_DeleteNode *ast_delete_node, Gra
     op_delete->node_count = 0;
     op_delete->edges_to_delete = (Edge***)malloc(sizeof(Edge**) * Vector_Size(ast_delete_node->graphEntities));
     op_delete->edge_count = 0;
-    op_delete->deleted_nodes = NewTrieMap();
-    op_delete->deleted_edges = NewTrieMap();
+    op_delete->deleted_nodes = raxNew();
+    op_delete->deleted_edges = raxNew();
     op_delete->result_set = result_set;
     
     _LocateEntities(op_delete, graph, ast_delete_node);
@@ -55,23 +55,10 @@ void _LocateEntities(OpDelete *op, Graph *g, AST_DeleteNode *ast_delete_node) {
     }
 }
 
-/* Fake free callback which does absolutly nothing, this is done 
- * so items removed from either node / edge stores do not get freed
- * upon removal. */
-void _NOP_CB(void *p) {
-}
-
-/* When adding either nodes or edges to deletion trie
- * incase we've already encountered a graph entity, simply use the one
- * already in the trie. */
-void* _NO_REPLACE_CB(void *oldval, void *newval) {
-    return oldval;
-}
-
-void _EnqueueEntityForDeletion(TrieMap *queue, GraphEntity *entity) {
+void _EnqueueEntityForDeletion(rax *queue, GraphEntity *entity) {
     char entity_id[256];
     size_t id_len = sprintf(entity_id, "%ld", entity->id);
-    TrieMap_Add(queue, entity_id, id_len, entity, _NO_REPLACE_CB);
+    raxInsert(queue, (unsigned char *)entity_id, id_len, entity, NULL);
 }
 
 void _DeleteNode(OpDelete *op, Node *n) {
@@ -83,12 +70,12 @@ void _DeleteNode(OpDelete *op, Node *n) {
 
     /* Remove node from all-node store. */
     LabelStore *all_node_store = LabelStore_Get(ctx, STORE_NODE, graph_name, NULL);
-    LabelStore_Remove(all_node_store, node_id, _NOP_CB);
+    LabelStore_Remove(all_node_store, node_id);
 
     /* Remove node from label store. */
     if(n->label != NULL) {
         LabelStore *all_node_store = LabelStore_Get(ctx, STORE_NODE, graph_name, n->label);
-        LabelStore_Remove(all_node_store, node_id, _NOP_CB);
+        LabelStore_Remove(all_node_store, node_id);
     }
 
     /* Remove node from hexastore. */
@@ -143,11 +130,11 @@ void _DeleteEdge(OpDelete *op, Edge *e) {
 
     /* Remove edge from all-edge store. */ 
     LabelStore *all_edge_store = LabelStore_Get(ctx, STORE_EDGE, graph_name, NULL);
-    LabelStore_Remove(all_edge_store, edge_id, _NOP_CB);
+    LabelStore_Remove(all_edge_store, edge_id);
 
     /* Remove edge from relation store. */ 
     LabelStore *edge_store = LabelStore_Get(ctx, STORE_EDGE, graph_name, e->relationship);
-    LabelStore_Remove(edge_store, edge_id, _NOP_CB);
+    LabelStore_Remove(edge_store, edge_id);
 
     /* Remove edge from its source and destination nodes. */
     /* Remove edge from its source node. */
@@ -195,21 +182,27 @@ void _DeleteEdge(OpDelete *op, Edge *e) {
 
 void _DeleteEntities(OpDelete *op) {
     char *id;
-    tm_len_t id_len;
+    uint16_t id_len;
     Node *n;
     Edge *e;
 
-    TrieMapIterator *it = TrieMap_Iterate(op->deleted_nodes, "", 0);
-    while(TrieMapIterator_Next(it, &id, &id_len, (void**)&n)) {
+    raxIterator it;
+    raxStart(&it, op->deleted_nodes);
+    raxSeek(&it,"^", NULL, 0);
+    while(raxNext(&it)) {
+        n = it.data;
         _DeleteNode(op, n);
     }
-    TrieMapIterator_Free(it);
+    raxStop(&it);
 
-    it = TrieMap_Iterate(op->deleted_edges, "", 0);
-    while(TrieMapIterator_Next(it, &id, &id_len, (void**)&e)) {
+    raxStart(&it, op->deleted_edges);
+    raxSeek(&it,"^", NULL, 0);
+
+    while(raxNext(&it)) {
+        e = it.data;
         _DeleteEdge(op, e);
     }
-    TrieMapIterator_Free(it);
+    raxStop(&it);
 }
 
 OpResult OpDeleteConsume(OpBase *opBase, Graph* graph) {
@@ -248,6 +241,6 @@ void OpDeleteFree(OpBase *ctx) {
     _DeleteEntities(op);
     free(op->nodes_to_delete);
     free(op->edges_to_delete);
-    TrieMap_Free(op->deleted_nodes, _NOP_CB);
-    TrieMap_Free(op->deleted_edges, _NOP_CB);
+    raxFree(op->deleted_nodes);
+    raxFree(op->deleted_edges);
 }

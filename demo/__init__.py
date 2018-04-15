@@ -5,7 +5,7 @@ class QueryInfo(object):
 
     def __init__(self, query=None, description=None, max_run_time_ms=None, expected_result=None):
         """
-        QueryInfo contructor
+        QueryInfo constructor
 
         :param query: The query itself (string)
         :param description: The information about what the query does (string)

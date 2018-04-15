@@ -197,7 +197,7 @@ int SIValue_ToString(SIValue v, char *buf, size_t len) {
     bytes_written = snprintf(buf, len, "%lld", (long long)v.longval);
     break;
   case T_UINT:
-    bytes_written = snprintf(buf, len, "%zd", v.uintval);
+    bytes_written = snprintf(buf, len, "%llu", v.uintval);
     break;  
   case T_BOOL:
     bytes_written = snprintf(buf, len, "%s", v.boolval ? "true" : "false");
@@ -416,7 +416,7 @@ void SIValue_Print(FILE *outstream, SIValue *v) {
       fprintf(outstream, "%d", v->intval);
       break;
     case T_INT64:
-      fprintf(outstream, "%ld", v->longval);
+      fprintf(outstream, "%lld", v->longval);
       break;
     case T_UINT:
       fprintf(outstream, "%u", v->intval);

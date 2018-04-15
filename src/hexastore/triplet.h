@@ -4,7 +4,7 @@
 #include "../graph/node.h"
 #include "../graph/edge.h"
 #include "../redismodule.h"
-#include "../util/triemap/triemap.h"
+#include "../dep/rax/rax.h"
 #include "../rmutil/sds.h"
 
 #define TRIPLET_ELEMENT_DELIMITER ":"
@@ -18,7 +18,7 @@ typedef struct {
 	TripletKind kind;
 } Triplet;
 
-typedef TrieMapIterator TripletIterator;
+typedef raxIterator TripletIterator;
 
 /* Creates a new triplet */
 Triplet* NewTriplet(Node *s, Edge *p, Node *o);
@@ -42,8 +42,8 @@ void FreeTriplet(Triplet *triplet);
 // -------------Triplet cursor-------------
 
 // Returns the next triplet from the cursor.
-int TripletIterator_Next(TripletIterator* iterator, Triplet** triplet);
+int TripletIterator_Next(TripletIterator* it, Triplet** triplet);
 
-void TripletIterator_Free(TripletIterator *cursor);
+void TripletIterator_Free(TripletIterator *it);
 
 #endif

@@ -13,12 +13,12 @@
 
  typedef struct {
     OpBase op;
-    Node **node;            /* node being scanned */
+    Node **node;                /* node being scanned */
     Node *_node;
-    LabelStore *store;           /* store being scanned */
-    RedisModuleCtx *ctx;    /* redis module API context */
-    const char *graph;      /* queried graph id */
-    LabelStoreIterator *iter;    /* graph iterator */
+    LabelStore *store;          /* store being scanned */
+    RedisModuleCtx *ctx;        /* redis module API context */
+    const char *graph;          /* queried graph id */
+    LabelStoreIterator iter;    /* graph iterator */
  } AllNodeScan;
 
 OpBase* NewAllNodeScanOp(RedisModuleCtx *ctx, Graph *g, Node **n, const char *graph_name);

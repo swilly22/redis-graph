@@ -2,11 +2,11 @@
 #define GROUP_CACHE_H_
 
 #include "group.h"
-#include "../util/triemap/triemap.h"
+#include "../dep/rax/rax.h"
 #include "../rmutil/vector.h"
 
-typedef TrieMap CacheGroup;
-typedef TrieMapIterator CacheGroupIterator;
+typedef rax CacheGroup;
+typedef raxIterator CacheGroupIterator;
 
 static CacheGroup *__groupCache = NULL;
 
@@ -20,8 +20,9 @@ void CacheGroupGet(char *key, Group **group);
 
 void FreeGroupCache();
 
-// Returns an iterator to scan hashtable
-CacheGroupIterator* CacheGroupIter();
+// Initialize an iterator to scan groups.
+void CacheGroupIter(CacheGroupIterator *it);
+
 // Advance iterator and returns key & value in current position.
 int CacheGroupIterNext(CacheGroupIterator *iter, char **key, Group **group);
 

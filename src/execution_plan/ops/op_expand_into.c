@@ -17,7 +17,7 @@ ExpandInto* NewExpandInto(RedisModuleCtx *ctx, Graph *g, const char *graph_name,
     expandInto->ctx = ctx;
     expandInto->str_triplet = sdsempty();
     expandInto->hexastore = GetHexaStore(ctx, graph_name);
-    expandInto->iter = HexaStore_Search(expandInto->hexastore, "");
+    HexaStore_Search(expandInto->hexastore, "", &expandInto->iter);
 
     // Set our Op operations
     expandInto->op.name = "Expand Into";
@@ -57,11 +57,11 @@ OpResult ExpandIntoConsume(OpBase *opBase, Graph* graph) {
     TripletToString(&t, &op->str_triplet);
 
     /* Search hexastore, reuse iterator. */
-    HexaStore_Search_Iterator(op->hexastore, op->str_triplet, op->iter);
+    HexaStore_Search_Iterator(op->hexastore, op->str_triplet, &op->iter);
     
     /* No connection between src and dest. */
     Triplet *triplet = NULL;
-    if(!TripletIterator_Next(op->iter, &triplet)) return OP_REFRESH;
+    if(!TripletIterator_Next(&op->iter, &triplet)) return OP_REFRESH;
 
     /* Update graph. */
     *op->relation = triplet->predicate;
