@@ -1,13 +1,7 @@
-FROM redis:latest as builder
-
-ENV DEPS "python python-setuptools python-pip wget build-essential"
+FROM redislabsmodules/rmbuilder:latest as builder
 
 # Set up a build environment
 RUN set -ex;\
-    deps="$DEPS";\
-    apt-get update;\
-    apt-get install -y --no-install-recommends $deps;\
-    pip install rmtest;\
     pip install redisgraph;
 
 # Build the source
@@ -20,10 +14,10 @@ RUN set -ex;\
 
 # Package the runner
 FROM redis:latest
-ENV LIBDIR /var/lib/redis/modules
+ENV LIBDIR /usr/lib/redis/modules
 WORKDIR /data
 RUN set -ex;\
     mkdir -p "$LIBDIR";
 COPY --from=builder /redisgraph/src/redisgraph.so "$LIBDIR"
 
-CMD ["redis-server", "--loadmodule", "/var/lib/redis/modules/redisgraph.so"]
+CMD ["redis-server", "--loadmodule", "/usr/lib/redis/modules/redisgraph.so"]
