@@ -165,7 +165,6 @@ number_of_vacations_per_person_query = QueryInfo(
                      ['Valerie Abigail Arad', '2.000000']]
 )
 
-
 queries_info = [
     my_friends_query,
     friends_of_friends_query,

@@ -175,6 +175,5 @@ class SocialFlowTest(FlowTestsBase):
         # assert query run time
         self._assert_run_time(actual_result, queries.number_of_vacations_per_person_query)
 
-
 if __name__ == '__main__':
     unittest.main()

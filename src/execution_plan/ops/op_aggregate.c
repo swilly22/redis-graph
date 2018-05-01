@@ -5,11 +5,11 @@
 #include "../../grouping/group_cache.h"
 #include "../../query_executor.h"
 
-OpBase* NewAggregateOp(RedisModuleCtx *ctx, AST_QueryExpressionNode *ast) {
+OpBase* NewAggregateOp(RedisModuleCtx *ctx, AST_Query *ast) {
     return (OpBase*)NewAggregate(ctx, ast);
 }
 
-Aggregate* NewAggregate(RedisModuleCtx *ctx, AST_QueryExpressionNode *ast) {
+Aggregate* NewAggregate(RedisModuleCtx *ctx, AST_Query *ast) {
     Aggregate *aggregate = malloc(sizeof(Aggregate));
     aggregate->ctx = ctx;
     aggregate->ast = ast;
@@ -30,7 +30,7 @@ Aggregate* NewAggregate(RedisModuleCtx *ctx, AST_QueryExpressionNode *ast) {
 
 /* Construct an aggregated expression tree foreach aggregated term. 
  * Returns a vector of aggregated expression trees. */
-Vector* _build_aggregated_expressions(AST_QueryExpressionNode *ast, Graph* g) {
+Vector* _build_aggregated_expressions(AST_Query *ast, Graph* g) {
     Vector *aggregated_expressions = NewVector(AR_ExpNode*, 1);
 
     for(int i = 0; i < Vector_Size(ast->returnNode->returnElements); i++) {

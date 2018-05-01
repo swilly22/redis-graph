@@ -40,7 +40,7 @@ typedef struct {
 } ExecutionPlan;
 
 /* Creates a new execution plan from AST */
-ExecutionPlan *NewExecutionPlan(RedisModuleCtx *ctx, const char *graph, AST_QueryExpressionNode *ast);
+ExecutionPlan *NewExecutionPlan(RedisModuleCtx *ctx, const char *graph, AST_Query *ast);
 
 /* Prints execution plan */
 char* ExecutionPlanPrint(const ExecutionPlan *plan);

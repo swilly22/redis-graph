@@ -4,6 +4,7 @@
 #include "./graph/graph_entity.h"
 #include "./arithmetic/agg_ctx.h"
 #include "./parser/ast.h"
+#include "./parser/ast_arithmetic_expression.h"
 #include "./graph/graph.h"
 
 /* Forward declarations. */

@@ -53,7 +53,7 @@ void _EdgesSrcDestAliases(OpCreate *op, Graph* graph) {
 
 void _SetModifiedEntities(OpCreate *op, Graph* graph) {
     /* Determin which entities are modified by create op.
-     * Serach uninitialized nodes. */
+     * Search uninitialized nodes. */
     for(int i = 0; i < graph->node_count; i++) {
         Node *n = graph->nodes[i];
         if(n->id == INVALID_ENTITY_ID) {
@@ -76,7 +76,7 @@ void _SetModifiedEntities(OpCreate *op, Graph* graph) {
         }
     }
 
-    /* Serach for uninitialized edges. */
+    /* Search for uninitialized edges. */
     for(int i = 0; i < graph->edge_count; i++) {
         Edge *e = graph->edges[i];
         if(e->id == INVALID_ENTITY_ID) {
@@ -103,8 +103,9 @@ void _SetModifiedEntities(OpCreate *op, Graph* graph) {
         op->edges_to_create = edges_to_create;
     }
 
-    /* Create must modify atleast one entity. */
-    assert((op->node_count + op->edge_count) > 0);
+    /* Create must modify atleast one entity.
+     * Not true in the case of MERGE. */
+    // assert((op->node_count + op->edge_count) > 0);
 }
 
 void _CreateNodes(RedisModuleCtx *ctx, OpCreate *op) {
