@@ -36,6 +36,29 @@
 
 #include "execution_plan/execution_plan.h"
 
+AST_Query* _parse_query(RedisModuleCtx *ctx, const char *query, const char *graphName, char **errMsg) {
+    AST_Query* ast;
+
+    ast = ParseQuery(query, strlen(query), errMsg);
+
+    if (!ast) {
+        RedisModule_Log(ctx, "debug", "Error parsing query: %s", errMsg);
+        RedisModule_ReplyWithError(ctx, *errMsg);
+        free(*errMsg);
+        return NULL;
+    }
+
+    Modify_AST(ctx, ast, graphName);
+
+    char *reason;
+    if (Validate_AST(ast, &reason) != AST_VALID) {
+        RedisModule_ReplyWithError(ctx, reason);
+        return NULL;
+    }
+
+    return ast;
+}
+
 /* Removes given graph.
  * Args:
  * argv[1] graph name
@@ -49,11 +72,11 @@ int MGraph_DeleteGraph(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) 
     char *graph;
     char *storeId;
     RMUtil_ParseArgs(argv, argc, 1, "c", &graph);
-    
+
     LabelStore *store = LabelStore_Get(ctx, STORE_NODE, graph, NULL);
     LabelStoreIterator it;
     LabelStore_Scan(store, &it);
-    
+
     char *nodeId;
     uint16_t nodeIdLen;
     Node *node;
@@ -66,13 +89,13 @@ int MGraph_DeleteGraph(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) 
         RedisModule_CloseKey(key);
     }
     LabelStoreIterator_Free(&it);
-    
+
     int storeIdLen = LabelStore_Id(&storeId, STORE_NODE, graph, NULL);
     RedisModuleString *rmStoreId = RedisModule_CreateString(ctx, storeId, storeIdLen);
     free(storeId);
     key = RedisModule_OpenKey(ctx, rmStoreId, REDISMODULE_WRITE);
     RedisModule_FreeString(ctx, rmStoreId);
-    
+
     /* Deletes the actual store + each stored node. */
     RedisModule_DeleteKey(key);
     RedisModule_CloseKey(key);
@@ -98,11 +121,11 @@ int MGraph_DeleteGraph(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) 
     free(storeId);
     key = RedisModule_OpenKey(ctx, rmStoreId, REDISMODULE_WRITE);
     RedisModule_FreeString(ctx, rmStoreId);
-    
+
     /* Deletes the actual store + each stored edge. */
     RedisModule_DeleteKey(key);
     RedisModule_CloseKey(key);
-    
+
     /* TODO: delete store key.
      * TODO: Delete label stores... */
     RedisModule_ReplyWithSimpleString(ctx, "OK");
@@ -126,29 +149,8 @@ int MGraph_Query(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 
     /* Parse query, get AST. */
     char *errMsg = NULL;
-
-    AST_QueryExpressionNode* ast;
-
-    ast = ParseQuery(query, strlen(query), &errMsg);
-
-    if (!ast) {
-        RedisModule_Log(ctx, "debug", "Error parsing query: %s", errMsg);
-        RedisModule_ReplyWithError(ctx, errMsg);
-        free(errMsg);
-        return REDISMODULE_OK;
-    }
-    
-    char *reason;
-    if (Validate_AST(ast, &reason) != AST_VALID) {
-        RedisModule_ReplyWithError(ctx, reason);
-        return REDISMODULE_OK;
-    }
-    
-    /* Modify AST */
-    if(ReturnClause_ContainsCollapsedNodes(ast) == 1) {
-        /* Expand collapsed nodes. */
-        ReturnClause_ExpandCollapsedNodes(ctx, ast, graphName);
-    }
+    AST_Query* ast = _parse_query(ctx, query, graphName, &errMsg);
+    if (!ast) return REDISMODULE_OK;
 
     ExecutionPlan *plan = NewExecutionPlan(ctx, graphName, ast);
     ResultSet* resultSet = ExecutionPlan_Execute(plan);
@@ -158,12 +160,12 @@ int MGraph_Query(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 
     /* Replicate query only if it modified the keyspace. */
     if(Query_Modifies_KeySpace(ast) &&
-       (resultSet->labels_added > 0 ||
-       resultSet->nodes_created > 0 ||
-       resultSet->properties_set > 0 ||
-       resultSet->relationships_created > 0 ||
-       resultSet->nodes_deleted > 0 ||
-       resultSet->relationships_deleted > 0)) {
+            (resultSet->labels_added > 0 ||
+             resultSet->nodes_created > 0 ||
+             resultSet->properties_set > 0 ||
+             resultSet->relationships_created > 0 ||
+             resultSet->nodes_deleted > 0 ||
+             resultSet->relationships_deleted > 0)) {
         RedisModule_ReplicateVerbatim(ctx);
     }
 
@@ -172,12 +174,12 @@ int MGraph_Query(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     /* Report execution timing. */
     end = clock();
     double elapsed = (double)(end - start) / CLOCKS_PER_SEC;
-    double elapsedMS = elapsed * 1000; 
+    double elapsedMS = elapsed * 1000;
     char* strElapsed;
     asprintf(&strElapsed, "Query internal execution time: %f milliseconds", elapsedMS);
     RedisModule_ReplyWithStringBuffer(ctx, strElapsed, strlen(strElapsed));
     free(strElapsed);
-    
+
     /* TODO: free AST
      * FreeQueryExpressionNode(ast); */
     return REDISMODULE_OK;
@@ -190,27 +192,15 @@ int MGraph_Query(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
  * argv[2] query */
 int MGraph_Explain(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
     if (argc < 2) return RedisModule_WrongArity(ctx);
-    
+
     const char *graphName;
     const char *query;
     RMUtil_ParseArgs(argv, argc, 1, "cc", &graphName, &query);
 
     /* Parse query, get AST. */
     char *errMsg = NULL;
-    AST_QueryExpressionNode *ast = ParseQuery(query, strlen(query), &errMsg);
-    
-    if (!ast) {
-        RedisModule_Log(ctx, "debug", "Error parsing query: %s", errMsg);
-        RedisModule_ReplyWithError(ctx, errMsg);
-        free(errMsg);
-        return REDISMODULE_OK;
-    }
-    
-    /* Modify AST */
-    if(ReturnClause_ContainsCollapsedNodes(ast) == 1) {
-        /* Expand collapsed nodes. */
-        ReturnClause_ExpandCollapsedNodes(ctx, ast, graphName);
-    }
+    AST_Query* ast = _parse_query(ctx, query, graphName, &errMsg);
+    if (!ast) return REDISMODULE_OK;
 
     ExecutionPlan *plan = NewExecutionPlan(ctx, graphName, ast);
     char* strPlan = ExecutionPlanPrint(plan);
@@ -219,7 +209,7 @@ int MGraph_Explain(RedisModuleCtx *ctx, RedisModuleString **argv, int argc) {
 
     RedisModule_ReplyWithStringBuffer(ctx, strPlan, strlen(strPlan));
     free(strPlan);
-    
+
     /* TODO: free AST
      * FreeQueryExpressionNode(ast); */
     return REDISMODULE_OK;

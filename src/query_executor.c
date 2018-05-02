@@ -49,7 +49,7 @@ void BuildGraph(Graph *graph, Vector *entities) {
         Vector_Get(entities, i, &entity);
 
         if(entity->t != N_LINK) continue;
-        
+
         /* No duplicates. */
         if(Graph_GetEdgeByAlias(graph, entity->alias) != NULL) continue;
 
@@ -59,7 +59,7 @@ void BuildGraph(Graph *graph, Vector *entities) {
 
         if(edge->direction == N_LEFT_TO_RIGHT) {
             Vector_Get(entities, i-1, &src_node);
-            Vector_Get(entities, i+1, &dest_node);    
+            Vector_Get(entities, i+1, &dest_node);
         } else {
             Vector_Get(entities, i+1, &src_node);
             Vector_Get(entities, i-1, &dest_node);
@@ -67,7 +67,7 @@ void BuildGraph(Graph *graph, Vector *entities) {
 
         Node *src = Graph_GetNodeByAlias(graph, src_node->alias);
         Node *dest = Graph_GetNodeByAlias(graph, dest_node->alias);
-        
+
         Edge *e = NewEdge(INVALID_ENTITY_ID, src, dest, edge->ge.label);
 
         /* Add properties. */
@@ -107,68 +107,11 @@ void Build_None_Aggregated_Arithmetic_Expressions(AST_ReturnNode *return_node, A
     }
 }
 
-int ReturnClause_ContainsCollapsedNodes(AST_QueryExpressionNode *ast) {
-    if(!ast->returnNode) return 0;
+int ReturnClause_ExpandCollapsedNodes(RedisModuleCtx *ctx, AST_Query *ast, const char *graphName) {
+    int modified = 0;
+    if(!ReturnClause_ContainsCollapsedNodes(ast->returnNode)) return modified;
 
-    AST_ReturnNode *return_node = ast->returnNode;
-    for(int i = 0; i < Vector_Size(return_node->returnElements); i++) {
-        AST_ReturnElementNode *ret_elem;
-        Vector_Get(return_node->returnElements, i, &ret_elem);
-        AST_ArithmeticExpressionNode *exp = ret_elem->exp;
-        /* Detect collapsed entity,
-         * A collapsed entity is represented by an arithmetic expression
-         * of AST_AR_EXP_OPERAND type, 
-         * The operand type should be AST_AR_EXP_VARIADIC,
-         * lastly property should be missing. */
-        if(exp->type == AST_AR_EXP_OPERAND &&
-            exp->operand.type == AST_AR_EXP_VARIADIC &&
-            exp->operand.variadic.property == NULL) {
-                return 1;
-        }
-    }
-    return 0;
-}
-
-int _ContainsAggregation(AST_ArithmeticExpressionNode *exp) {
-    if(exp->type == AST_AR_EXP_OPERAND) {
-        return 0;
-    }
-    
-    /* Try to get an aggregation function. */
-    AggCtx* ctx;
-    Agg_GetFunc(exp->op.function, &ctx);
-    if(ctx != NULL) return 1;
-
-    /* Scan sub expressions. */
-    for(int i = 0; i < Vector_Size(exp->op.args); i++) {
-        AST_ArithmeticExpressionNode *child_exp;
-        Vector_Get(exp->op.args, i, &child_exp);
-        if(_ContainsAggregation(child_exp)) return 1;
-    }
-
-    return 0;
-}
-
-/* Checks if return clause uses aggregation. */
-int ReturnClause_ContainsAggregation(AST_QueryExpressionNode *ast) {
-    if(!ast->returnNode) return 0;
-
-    AST_ReturnNode *return_node = ast->returnNode;
-
-    for(int i = 0; i < Vector_Size(return_node->returnElements); i++) {
-        AST_ReturnElementNode *ret_elem;
-        Vector_Get(return_node->returnElements, i, &ret_elem);
-        AST_ArithmeticExpressionNode *exp = ret_elem->exp;
-
-        /* Scan expression for an aggregation function. */
-        if (_ContainsAggregation(exp)) return 1;
-    }
-
-    return 0;
-}
-
-void ReturnClause_ExpandCollapsedNodes(RedisModuleCtx *ctx, AST_QueryExpressionNode *ast, const char *graphName) {
-     /* Create a new return clause */
+    /* Create a new return clause */
     Vector *expandReturnElements = NewVector(AST_ReturnElementNode*, Vector_Size(ast->returnNode->returnElements));
 
     /* Scan return clause, search for collapsed nodes. */
@@ -176,16 +119,16 @@ void ReturnClause_ExpandCollapsedNodes(RedisModuleCtx *ctx, AST_QueryExpressionN
         AST_ReturnElementNode *ret_elem;
         Vector_Get(ast->returnNode->returnElements, i, &ret_elem);
         AST_ArithmeticExpressionNode *exp = ret_elem->exp;
-        
+
         /* Detect collapsed entity,
          * A collapsed entity is represented by an arithmetic expression
-         * of AST_AR_EXP_OPERAND type, 
+         * of AST_AR_EXP_OPERAND type,
          * The operand type should be AST_AR_EXP_VARIADIC,
          * lastly property should be missing. */
         if(exp->type == AST_AR_EXP_OPERAND &&
-            exp->operand.type == AST_AR_EXP_VARIADIC &&
-            exp->operand.variadic.property == NULL) {
-            
+                exp->operand.type == AST_AR_EXP_VARIADIC &&
+                exp->operand.variadic.property == NULL) {
+
             /* Return clause doesn't contains entity's label,
              * Find collapsed entity's label. */
             AST_GraphEntity *collapsed_entity = NULL;
@@ -197,14 +140,7 @@ void ReturnClause_ExpandCollapsedNodes(RedisModuleCtx *ctx, AST_QueryExpressionN
                     break;
                 }
             }
-            
-            /* Failed to find collapsed entity. */
-            if(collapsed_entity == NULL) {
-                /* Invalid query, return clause refers to non-existent entity. */
-                /* TODO: Validate query. */
-                printf("Error, could not find collapsed entity\n");
-                return;
-            }
+            assert(collapsed_entity != NULL);
 
             /* Find label's properties. */
             LabelStoreType store_type = (collapsed_entity->t == N_ENTITY) ? STORE_NODE : STORE_EDGE;
@@ -279,6 +215,7 @@ void ReturnClause_ExpandCollapsedNodes(RedisModuleCtx *ctx, AST_QueryExpressionN
             }
             /* Discard collapsed return element. */
             Free_AST_ReturnElementNode(ret_elem);
+            modified = 1;
         } else {
             Vector_Push(expandReturnElements, ret_elem);
         }
@@ -286,59 +223,69 @@ void ReturnClause_ExpandCollapsedNodes(RedisModuleCtx *ctx, AST_QueryExpressionN
     /* Override previous return clause. */
     Vector_Free(ast->returnNode->returnElements);
     ast->returnNode->returnElements = expandReturnElements;
+    return modified;
 }
 
-void _nameAnonymousNodes(Vector *entities, int *entity_id) {
+int _nameAnonymousNodes(Vector *entities, int *entity_id) {
+    int modified = 0;
+
     /* Foreach graph entity: node/edge. */
     for(int i = 0; i < Vector_Size(entities); i++) {
         AST_GraphEntity *entity;
         Vector_Get(entities, i, &entity);
-        
+
         if (entity->alias == NULL) {
             asprintf(&entity->alias, "anon_%d", *entity_id);
             (*entity_id)++;
+            modified = 1;
         }
     }
+
+    return modified;
 }
 
-void nameAnonymousNodes(AST_QueryExpressionNode *ast) {
+int nameAnonymousNodes(AST_Query *ast) {
+    int modified = 0;
     int entity_id = 0;
 
     if(ast->matchNode)
-        _nameAnonymousNodes(ast->matchNode->graphEntities, &entity_id);
+        modified |= _nameAnonymousNodes(ast->matchNode->graphEntities, &entity_id);
 
     if(ast->createNode)
-        _nameAnonymousNodes(ast->createNode->graphEntities, &entity_id);
+        modified |= _nameAnonymousNodes(ast->createNode->graphEntities, &entity_id);
+
+    if(ast->mergeNode)
+        modified |= _nameAnonymousNodes(ast->mergeNode->nodes, &entity_id);
+
+    return modified;
 }
 
-void inlineProperties(AST_QueryExpressionNode *ast) {
-    /* Migrate inline filters to WHERE clause. */
-    if(!ast->matchNode) return;
-    Vector *entities = ast->matchNode->graphEntities;
+int inlineProperties(AST_Query *ast) {
+    int modified = 0;
 
-    /* Foreach entity. */
+    /* Migrate inline filters to WHERE clause. */
+    if(!ast->matchNode) return modified;
+
+    Vector *entities = ast->matchNode->graphEntities;
     for(int i = 0; i < Vector_Size(entities); i++) {
         AST_GraphEntity *entity;
         Vector_Get(entities, i, &entity);
 
         Vector *properties = entity->properties;
-        if(properties == NULL) {
-            continue;
-        }
+        if(properties == NULL) continue;
+        modified = 1;
 
-        /* Foreach property. */
-        for(int j = 0; j < Vector_Size(properties); j+=2) {
-            SIValue *key;
-            SIValue *val;
-
-            Vector_Get(properties, j, &key);
-            Vector_Get(properties, j+1, &val);
-
+        SIValue *key;
+        SIValue *val;
+        /* Create a WHERE condition from each property. */
+        for(int i = 0; i < Vector_Size(properties); i+=2) {
+            Vector_Get(properties, i, &key);    /* TODO: key might be leaking. */
+            Vector_Get(properties, i+1, &val);
             const char *alias = entity->alias;
             const char *property = key->stringval;
 
             AST_FilterNode *filterNode = New_AST_ConstantPredicateNode(alias, property, EQ, *val);
-            
+
             /* Create WHERE clause if missing. */
             if(ast->whereNode == NULL) {
                 ast->whereNode = New_AST_WhereNode(filterNode);
@@ -349,23 +296,74 @@ void inlineProperties(AST_QueryExpressionNode *ast) {
                 ast->whereNode->filters = New_AST_ConditionNode(left, AND, right);
             }
         }
+        Vector_Free(entity->properties);
+        entity->properties = NULL;
     }
+
+    return modified;
 }
 
-int Query_Modifies_KeySpace(const AST_QueryExpressionNode *ast) {
+int Query_Modifies_KeySpace(const AST_Query *ast) {
     return (ast->createNode != NULL || ast->deleteNode != NULL);
 }
 
-AST_QueryExpressionNode* ParseQuery(const char *query, size_t qLen, char **errMsg) {
-    AST_QueryExpressionNode *ast = Query_Parse(query, qLen, errMsg);
-    
-    if (!ast) {
-        return NULL;
-    }
-    
-    /* Modify AST. */
-    nameAnonymousNodes(ast);
-    inlineProperties(ast);
+/* Merge clause is replaced by MATCH and CREATE clauses. */
+int MergeClauseTransform(AST_Query *ast) {
+    int modified = 0;
+    if(!ast->mergeNode) return modified;
 
+    /* Clone merge nodes, this is done due to match/create clause free. */
+    size_t node_count = Vector_Size(ast->mergeNode->nodes);
+    Vector *match_elements = NewVector(AST_GraphEntity*, node_count);
+    Vector *create_elements = NewVector(AST_GraphEntity*, node_count);
+
+    AST_GraphEntity *node = NULL;
+    while(Vector_Pop(ast->mergeNode->nodes, &node)) {
+        /* Clone node's properties. */
+        size_t prop_count = Vector_Size(node->properties);
+        Vector *clone_properties = NewVector(SIValue*, prop_count);
+
+        for(int i = 0; i < prop_count; i++) {
+            SIValue *prop;
+            SIValue *clone_prop = malloc(sizeof(SIValue));
+            Vector_Get(node->properties, i, &prop);
+            *clone_prop = SI_Clone(*prop);
+            Vector_Push(clone_properties, clone_prop);
+        }
+
+        AST_NodeEntity *clone_node = New_AST_NodeEntity(strdup(node->alias),
+                                     strdup(node->label),
+                                     clone_properties);
+
+        Vector_Push(match_elements, node); /* Reuse merge node. */
+        Vector_Push(create_elements, clone_node);
+    }
+
+    /* Introduce new MATCH and CREATE clauses, remove MERGE clause. */
+    ast->matchNode = New_AST_MatchNode(match_elements);
+    ast->createNode = New_AST_CreateNode(create_elements);
+    Free_AST_MergeNode(ast->mergeNode);
+    ast->mergeNode = NULL;
+    modified = 1;
+
+    return modified;
+}
+
+void Modify_AST(RedisModuleCtx *ctx, AST_Query *ast, const char *graphName) {
+    /* Each AST modification must return a value indicating if it has modified
+     * the AST in some way, the behavior should be such that a modification function F,
+     * if F is called more then once, consecutively, F() F() than the second call MUST NOT
+     * perform any modifications on the AST. */
+    while(1) {
+        if(nameAnonymousNodes(ast)) continue;
+        if(inlineProperties(ast)) continue;
+        if(ReturnClause_ExpandCollapsedNodes(ctx, ast, graphName)) continue;
+        if(MergeClauseTransform(ast)) continue;
+        break;
+    }
+}
+
+AST_Query* ParseQuery(const char *query, size_t qLen, char **errMsg) {
+    AST_Query *ast = Query_Parse(query, qLen, errMsg);
     return ast;
 }

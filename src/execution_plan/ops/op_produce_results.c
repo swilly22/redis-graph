@@ -3,12 +3,12 @@
 #include "../../arithmetic/arithmetic_expression.h"
 #include "../../query_executor.h"
 
-OpBase* NewProduceResultsOp(RedisModuleCtx *ctx, AST_QueryExpressionNode *ast, ResultSet *result_set) {
+OpBase* NewProduceResultsOp(RedisModuleCtx *ctx, AST_Query *ast, ResultSet *result_set) {
     // *op = (OpBase *)NewProduceResults(ctx, ast, result_set);
     return (OpBase*)NewProduceResults(ctx, ast, result_set);
 }
 
-ProduceResults* NewProduceResults(RedisModuleCtx *ctx, AST_QueryExpressionNode *ast, ResultSet *result_set) {
+ProduceResults* NewProduceResults(RedisModuleCtx *ctx, AST_Query *ast, ResultSet *result_set) {
     ProduceResults *produceResults = malloc(sizeof(ProduceResults));
     produceResults->ctx = ctx;
     produceResults->ast = ast;

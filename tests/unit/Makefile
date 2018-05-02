@@ -97,7 +97,6 @@ test_skiplist_graph:
 
 all: build test
 
-
 build: agg_sum edge node graph value triplet resultset_record hexastore filter_tree arithmetic_expression aggregate_functions ast skiplist_generic skiplist_graph
 
 test: test_agg_sum test_edge test_node test_graph test_value test_triplet test_resultset_record test_hexastore test_filter_tree test_arithmetic_expression test_aggregate_functions test_ast test_skiplist_generic test_skiplist_graph
