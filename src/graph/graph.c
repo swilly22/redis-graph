@@ -74,6 +74,7 @@ Graph* NewGraph() {
     g->edge_count = 0;
     g->node_cap = DEFAULT_GRAPH_CAP;
     g->edge_cap = DEFAULT_GRAPH_CAP;
+    // TODO Memory leak on mallocs from NewGraph()
     g->nodes = (Node**)malloc(sizeof(Node*) * g->node_cap);
     g->edges = (Edge**)malloc(sizeof(Edge*) * g->edge_cap);
     g->node_aliases = (char**)malloc(sizeof(char*) * g->node_cap);

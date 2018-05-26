@@ -169,8 +169,8 @@ int ReturnClause_ExpandCollapsedNodes(RedisModuleCtx *ctx, AST_Query *ast, const
                 }
                 raxStop(&it);
             } else {
-                /* Entity does have a label.
-                 * We don't have a choice but to retrieve all know properties. */
+                /* Entity doesn't have a label.
+                 * We don't have a choice but to retrieve all known properties. */
                 size_t stores_len = 128;    /* Limit number of labels we'll consider. */
                 LabelStore *stores[128];    /* Label stores. */
 
