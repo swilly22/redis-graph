@@ -35,7 +35,7 @@
 #define SKIPLIST_P 0.25      /* Skiplist P = 1/4 */
 
 typedef struct skiplistNode {
-  void *obj;
+  void *key;
   void **vals;
   unsigned int numVals;
   unsigned int valsAllocated;
@@ -48,25 +48,30 @@ typedef struct skiplistNode {
 
 typedef int (*skiplistCmpFunc)(void *p1, void *p2, void *ctx);
 typedef int (*skiplistValCmpFunc)(const void *p1, const void *p2);
-typedef void (*skiplistFreeObjFunc)(void *p1);
+
+typedef void (*skiplistCloneKeyFunc)(void **key);
+typedef void (*skiplistFreeKeyFunc)(void *key);
 
 typedef struct skiplist {
   struct skiplistNode *header, *tail;
   skiplistCmpFunc compare;
   skiplistValCmpFunc valcmp;
-  skiplistFreeObjFunc freeObj;
+
+  skiplistCloneKeyFunc cloneKey;
+  skiplistFreeKeyFunc freeKey;
 
   void *cmpCtx;
   unsigned long length;
   int level;
 } skiplist;
 
-skiplist *skiplistCreate(skiplistCmpFunc cmp, void *cmpCtx, skiplistValCmpFunc vcmp, skiplistFreeObjFunc freeObj);
+skiplist *skiplistCreate(skiplistCmpFunc cmp, void *cmpCtx, skiplistValCmpFunc vcmp,
+                         skiplistCloneKeyFunc cloneKey, skiplistFreeKeyFunc freeKey);
 void skiplistFree(skiplist *sl);
-skiplistNode *skiplistInsert(skiplist *sl, void *obj, void *val);
-int skiplistDelete(skiplist *sl, void *obj, void *val);
-skiplistNode *skiplistFind(skiplist *sl, void *obj);
-skiplistNode *skiplistFindAtLeast(skiplist *sl, void *obj, int exclusive);
+skiplistNode *skiplistInsert(skiplist *sl, void *key, void *val);
+int skiplistDelete(skiplist *sl, void *key, void *val);
+skiplistNode *skiplistFind(skiplist *sl, void *key);
+skiplistNode *skiplistFindAtLeast(skiplist *sl, void *key, int exclusive);
 void *skiplistPopHead(skiplist *sl);
 void *skiplistPopTail(skiplist *sl);
 
@@ -80,10 +85,14 @@ typedef struct {
   skiplist *sl;
 } skiplistIterator;
 
-skiplistIterator skiplistIterateRange(skiplist *sl, void *min, void *max,
+skiplistIterator* skiplistIterateRange(skiplist *sl, void *min, void *max,
                                       int minExclusive, int maxExclusive);
 
-skiplistIterator skiplistIterateAll(skiplist *sl);
+skiplistIterator* skiplistIterateAll(skiplist *sl);
+
+void skiplistIterate_Reset(skiplistIterator *iter);
+void skiplistIterate_Free(skiplistIterator *iter);
+
 void *skiplistIterator_Next(skiplistIterator *it);
 
 #endif

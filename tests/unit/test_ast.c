@@ -101,8 +101,8 @@ void test_validate_return_clause() {
 
 int main(int argc, char **argv) {
     test_validate_set_clause();
-	test_validate_delete_clause();
+    test_validate_delete_clause();
     test_validate_return_clause();
-	printf("test_ast - PASS!\n");
+    printf("test_ast - PASS!\n");
     return 0;
 }

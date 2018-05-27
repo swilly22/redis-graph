@@ -60,15 +60,9 @@ static inline skiplistNode *skiplistIteratorCurrent(skiplistIterator *it) {
  * Create a skip list node with the specified number of levels, pointing to
  * the specified object.
  */
-skiplistNode *skiplistCreateNode(int level, void *obj, void *val) {
-/*
- * TODO:
- * Is this allocation...safe? I'm unused to gnu99 mode, so perhaps this makes sense in a way I
- * don't follow, but things do seem a bit dodgy, including the post-alloc size of *zn
- * (granted, everything works fine so far).
- */
+skiplistNode *skiplistCreateNode(int level, void *key, void *val) {
   skiplistNode *zn = zmalloc(sizeof(*zn) + level * sizeof(struct skiplistLevel));
-  zn->obj = obj;
+  zn->key = key;
   zn->vals = zmalloc(sizeof(void **));
   zn->valsAllocated = 1;
   if (val) {
@@ -100,8 +94,8 @@ skiplistNode *skiplistNodeAppendValue(skiplistNode *n, void *val,
  * Create a new skip list with the specified function used in order to
  * compare elements. The function return value is the same as strcmp().
  */
-skiplist *skiplistCreate(skiplistCmpFunc cmp, void *cmpCtx,
-                         skiplistValCmpFunc vcmp, skiplistFreeObjFunc freeObj) {
+skiplist *skiplistCreate(skiplistCmpFunc cmp, void *cmpCtx, skiplistValCmpFunc vcmp,
+                         skiplistCloneKeyFunc cloneKey, skiplistFreeKeyFunc freeKey) {
   int j;
   skiplist *sl = zmalloc(sizeof(struct skiplist));
   sl->level = 1;
@@ -117,7 +111,8 @@ skiplist *skiplistCreate(skiplistCmpFunc cmp, void *cmpCtx,
   sl->compare = cmp;
   sl->cmpCtx = cmpCtx;
   sl->valcmp = vcmp;
-  sl->freeObj = freeObj;
+  sl->cloneKey = cloneKey;
+  sl->freeKey = freeKey;
 
   return sl;
 }
@@ -159,7 +154,7 @@ int skiplistRandomLevel(void) {
  * Insert the specified object, return NULL if the element already
  * exists.
  */
-skiplistNode *skiplistInsert(skiplist *sl, void *obj, void *val) {
+skiplistNode *skiplistInsert(skiplist *sl, void *key, void *val) {
   skiplistNode *update[SKIPLIST_MAXLEVEL], *x;
   unsigned int rank[SKIPLIST_MAXLEVEL];
   int i, level;
@@ -169,7 +164,7 @@ skiplistNode *skiplistInsert(skiplist *sl, void *obj, void *val) {
     /* store rank that is crossed to reach the insert position */
     rank[i] = (i == (sl->level - 1)) ? 0 : rank[i + 1];
     while (x->level[i].forward &&
-           sl->compare(x->level[i].forward->obj, obj, sl->cmpCtx) < 0) {
+           sl->compare(x->level[i].forward->key, key, sl->cmpCtx) < 0) {
       rank[i] += x->level[i].span;
       x = x->level[i].forward;
     }
@@ -178,7 +173,7 @@ skiplistNode *skiplistInsert(skiplist *sl, void *obj, void *val) {
 
   /* If the element is already inside, append the value to the element. */
   if (x->level[0].forward &&
-      sl->compare(x->level[0].forward->obj, obj, sl->cmpCtx) == 0) {
+      sl->compare(x->level[0].forward->key, key, sl->cmpCtx) == 0) {
     return skiplistNodeAppendValue(x->level[0].forward, val, sl->valcmp);
   }
 
@@ -192,7 +187,15 @@ skiplistNode *skiplistInsert(skiplist *sl, void *obj, void *val) {
     }
     sl->level = level;
   }
-  x = skiplistCreateNode(level, obj, val);
+
+  /*
+   * If we have reached this point, the key is not already in the skiplist.
+   * If the skiplist was provided with a cloneKey routine (to duplicate
+   * volatile keys like SIValues), use it; otherwise the skiplistNode key
+   * will be set through pointer assignment.
+   */
+  if (sl->cloneKey) sl->cloneKey(&key);
+  x = skiplistCreateNode(level, key, val);
   for (i = 0; i < level; i++) {
     x->level[i].forward = update[i]->level[i].forward;
     update[i]->level[i].forward = x;
@@ -224,8 +227,8 @@ skiplistNode *skiplistInsert(skiplist *sl, void *obj, void *val) {
  * all the references of the node we are going to remove.
  */
 void skiplistDeleteNode(skiplist *sl, skiplistNode *x, skiplistNode **update) {
-  // Free the node key if we specified a routine for it
-  if (sl->freeObj) sl->freeObj(x->obj);
+  // Free the key contained in the skiplistNode if we specified a routine for it
+  if (sl->freeKey) sl->freeKey(x->key);
 
   int i;
   for (i = 0; i < sl->level; i++) {
@@ -250,24 +253,24 @@ void skiplistDeleteNode(skiplist *sl, skiplistNode *x, skiplistNode **update) {
 /*
  * Delete an element from the skiplist. If the `val` argument is provided,
  * the single matching value will be found and deleted; otherwise, the skiplistNode
- * representing the key matching `obj` and all of its elements will be deleted.
+ * representing the key matching `key` and all of its elements will be deleted.
  * If the operation is successful, 1 is returned, otherwise the target was not found and 0 is returned.
  * The memory used to represent skiplist keys and values is not freed.
  */
-int skiplistDelete(skiplist *sl, void *obj, void *val) {
+int skiplistDelete(skiplist *sl, void *key, void *val) {
   skiplistNode *update[SKIPLIST_MAXLEVEL], *x;
   int i;
 
   x = sl->header;
   for (i = sl->level - 1; i >= 0; i--) {
     while (x->level[i].forward &&
-           sl->compare(x->level[i].forward->obj, obj, sl->cmpCtx) < 0) {
+           sl->compare(x->level[i].forward->key, key, sl->cmpCtx) < 0) {
       x = x->level[i].forward;
     }
     update[i] = x;
   }
   x = x->level[0].forward;
-  if (x && sl->compare(x->obj, obj, sl->cmpCtx) == 0) {
+  if (x && sl->compare(x->key, key, sl->cmpCtx) == 0) {
 
     if (val) {
       // try to delete the value itself from the vallist
@@ -310,19 +313,19 @@ int skiplistDelete(skiplist *sl, void *obj, void *val) {
  * Search for the element in the skip list, if found the
  * node pointer is returned, otherwise NULL is returned.
  */
-skiplistNode* skiplistFind(skiplist *sl, void *obj) {
+skiplistNode* skiplistFind(skiplist *sl, void *key) {
   skiplistNode *x;
   int i;
 
   x = sl->header;
   for (i = sl->level - 1; i >= 0; i--) {
     while (x->level[i].forward &&
-           sl->compare(x->level[i].forward->obj, obj, sl->cmpCtx) < 0) {
+           sl->compare(x->level[i].forward->key, key, sl->cmpCtx) < 0) {
       x = x->level[i].forward;
     }
   }
   x = x->level[0].forward;
-  if (x && sl->compare(x->obj, obj, sl->cmpCtx) == 0) {
+  if (x && sl->compare(x->key, key, sl->cmpCtx) == 0) {
     return x;
   } else {
     return NULL;
@@ -333,13 +336,13 @@ skiplistNode* skiplistFind(skiplist *sl, void *obj) {
  * Search for the element in the skip list, if found the
  * node pointer is returned, otherwise the next pointer is returned.
  */
-skiplistNode* skiplistFindAtLeast(skiplist *sl, void *obj, int exclusive) {
+skiplistNode* skiplistFindAtLeast(skiplist *sl, void *key, int exclusive) {
   skiplistNode *x = sl->header;
   int i;
 
   for (i = sl->level - 1; i >= 0; i--) {
     while (x->level[i].forward) {
-      int rc = sl->compare(x->level[i].forward->obj, obj, sl->cmpCtx);
+      int rc = sl->compare(x->level[i].forward->key, key, sl->cmpCtx);
       if (rc < 0 || (rc == 0 && exclusive)) {
         x = x->level[i].forward;
       } else {
@@ -362,7 +365,7 @@ void *skiplistPopHead(skiplist *sl) {
   x = x->level[0].forward;
   if (!x) return NULL;
 
-  void *ptr = x->obj;
+  void *ptr = x->key;
   skiplistDelete(sl, ptr, NULL);
   return ptr;
 }
@@ -376,12 +379,12 @@ void *skiplistPopTail(skiplist *sl) {
 
   if (!x) return NULL;
 
-  void *ptr = x->obj;
+  void *ptr = x->key;
   skiplistDelete(sl, ptr, NULL);
   return ptr;
 }
 
-skiplistIterator skiplistIterateRange(skiplist *sl, void *min, void *max,
+skiplistIterator* skiplistIterateRange(skiplist *sl, void *min, void *max,
                                       int minExclusive, int maxExclusive) {
   skiplistNode *n;
   if (!min) {
@@ -392,29 +395,46 @@ skiplistIterator skiplistIterateRange(skiplist *sl, void *min, void *max,
   }
   if (n && max) {
     // make sure the first item of the range is not already above the range end
-    int c = sl->compare(n->obj, max, sl->cmpCtx);
+    int c = sl->compare(n->key, max, sl->cmpCtx);
     // TODO: Fix comparisons to work with null functions
     if (c > 0 || (c == 0 && maxExclusive)) {
       n = NULL;
     }
   }
-  return (skiplistIterator){.current = n,
-                            .rangeMin = min,
-                            .minExclusive = minExclusive,
-                            .rangeMax = max,
-                            .maxExclusive = maxExclusive,
-                            .currentValOffset = 0,
-                            .sl = sl};
+
+  skiplistIterator *iter = zmalloc(sizeof(skiplistIterator));
+  iter->current = n;
+  iter->currentValOffset = 0;
+  iter->rangeMin = min;
+  iter->minExclusive = minExclusive;
+  iter->rangeMax = max;
+  iter->maxExclusive = maxExclusive;
+  iter->sl = sl;
+
+  return iter;
 }
 
-skiplistIterator skiplistIterateAll(skiplist *sl) {
-  return (skiplistIterator){.current = sl->header->level[0].forward,
-                            .rangeMin = NULL,
-                            .minExclusive = 0,
-                            .rangeMax = NULL,
-                            .maxExclusive = 0,
-                            .sl = sl,
-                            .currentValOffset = 0};
+skiplistIterator* skiplistIterateAll(skiplist *sl) {
+  skiplistIterator *iter = calloc(1, sizeof(skiplistIterator));
+  iter->current = sl->header->level[0].forward;
+  iter->sl = sl;
+  return iter;
+}
+
+void skiplistIterate_Reset(skiplistIterator *iter) {
+  // If this iterator was built with a minimum value, we will traverse the skiplist
+  // to initialize it properly.
+  if (iter->rangeMin == NULL) {
+    iter->current = iter->sl->header->level[0].forward;
+  } else {
+    iter->current = skiplistFindAtLeast(iter->sl, iter->rangeMin, iter->minExclusive);
+  }
+
+  iter->currentValOffset = 0;
+}
+
+void skiplistIterate_Free(skiplistIterator *iter) {
+  zfree(iter);
 }
 
 void *skiplistIterator_Next(skiplistIterator *it) {
@@ -434,7 +454,7 @@ void *skiplistIterator_Next(skiplistIterator *it) {
 
     // make sure we don't pass the range max. NULL means +inf
     if (it->current && it->rangeMax) {
-      int c = it->sl->compare(it->current->obj, it->rangeMax, it->sl->cmpCtx);
+      int c = it->sl->compare(it->current->key, it->rangeMax, it->sl->cmpCtx);
       if (c > 0 || (c == 0 && it->maxExclusive)) {
         it->current = NULL;
       }
