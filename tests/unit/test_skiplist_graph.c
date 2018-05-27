@@ -4,7 +4,6 @@
 #include "../../src/util/skiplist.h"
 #include "../../src/value.h"
 #include "../../src/graph/node.h"
-#include "../../src/index/index.h"
 
 char *words[] = {"foo",  "bar",     "zap",    "pomo",
                  "pera", "arancio", "limone", NULL};
