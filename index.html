@@ -236,6 +236,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#running-tests" title="Running tests" class="md-nav__link">
+    Running tests
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#loading-the-module-to-redis" title="Loading the module to Redis" class="md-nav__link">
     Loading the module to Redis
   </a>
@@ -370,6 +377,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#running-tests" title="Running tests" class="md-nav__link">
+    Running tests
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#loading-the-module-to-redis" title="Loading the module to Redis" class="md-nav__link">
     Loading the module to Redis
   </a>
@@ -452,6 +466,7 @@
 <h2 id="quickstart">Quickstart<a class="headerlink" href="#quickstart" title="Permanent link">&para;</a></h2>
 <ol>
 <li><a href="#building-the-module">Build the Redis Graph module library</a></li>
+<li><a href="#running-tests">Running tests</a></li>
 <li><a href="#loading-the-module-to-redis">Load Redis Graph to Redis</a></li>
 <li><a href="#using-redis-graph">Use it from any client</a></li>
 </ol>
@@ -464,6 +479,18 @@
 </ul>
 <p>To build the module, run <code>make</code> in the project's directory:</p>
 <p>Congratulations! You can find the compiled module library at <code>src/redisgraph.so</code>.</p>
+<h2 id="running-tests">Running tests<a class="headerlink" href="#running-tests" title="Permanent link">&para;</a></h2>
+<p>To test RedisGraph run the followings:</p>
+<ol>
+<li>Install <code>python</code> and <code>pip</code>.</li>
+<li>Install the Redis Python client and the <code>rmtest</code> library. <code>pip install redis rmtest</code></li>
+</ol>
+<p>With these in place, you should be able to execute the following in the
+<code>redis-graph</code> directory:</p>
+<div class="codehilite"><pre><span></span>$ make test
+</pre></div>
+
+
 <h2 id="loading-the-module-to-redis">Loading the module to Redis<a class="headerlink" href="#loading-the-module-to-redis" title="Permanent link">&para;</a></h2>
 <p>Requirements:</p>
 <ul>
@@ -506,7 +533,7 @@ choice, the exact method for doing that may vary.</p>
 <div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">redis</span>
 
 <span class="n">r</span> <span class="o">=</span> <span class="n">redis</span><span class="o">.</span><span class="n">StrictRedis</span><span class="p">()</span>
-<span class="n">reply</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">execute_command</span><span class="p">(</span><span class="s1">&#39;GRAPH.QUERY&#39;</span><span class="p">,</span> <span class="s1">&#39;social&#39;</span><span class="p">,</span> <span class="s2">&quot;CREATE (:person {name:&#39;roi&#39;, age:32, gender:&#39;male&#39;, status:&#39;married&#39;)&quot;</span><span class="p">)</span>
+<span class="n">reply</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">execute_command</span><span class="p">(</span><span class="s1">&#39;GRAPH.QUERY&#39;</span><span class="p">,</span> <span class="s1">&#39;social&#39;</span><span class="p">,</span> <span class="s2">&quot;CREATE (:person {name:&#39;roi&#39;, age:32, gender:&#39;male&#39;, status:&#39;married&#39;})&quot;</span><span class="p">)</span>
 </pre></div>
 
 
@@ -602,6 +629,8 @@ choice, the exact method for doing that may vary.</p>
       
     
     
+      
+      <script>!function(e,t,a,n,o,c,i){e.GoogleAnalyticsObject=o,e[o]=e[o]||function(){(e[o].q=e[o].q||[]).push(arguments)},e[o].l=1*new Date,c=t.createElement(a),i=t.getElementsByTagName(a)[0],c.async=1,c.src=n,i.parentNode.insertBefore(c,i)}(window,document,"script","https://www.google-analytics.com/analytics.js","ga"),ga("create","UA-92003007-8","auto"),ga("set","anonymizeIp",!0),ga("send","pageview");var links=document.getElementsByTagName("a");Array.prototype.map.call(links,function(e){e.host!=document.location.host&&e.addEventListener("click",function(){var t=e.getAttribute("data-md-action")||"follow";ga("send","event","outbound",t,e.href)})});var query=document.forms.search.query;query.addEventListener("blur",function(){if(this.value){var e=document.location.pathname;ga("send","pageview",e+"?q="+this.value)}})</script>
       
     
   </body>

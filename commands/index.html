@@ -718,7 +718,7 @@ The simplest example of CREATE would be a single node creation:</p>
 <p>Adding relations between nodes, in the following example we first locate an existing source node,
 once found we create a new relationship and destination node.</p>
 <div class="codehilite"><pre><span></span>MATCH<span class="o">(</span>a:person<span class="o">)</span>
-WHEREE a.name <span class="o">=</span> <span class="s1">&#39;Kurt&#39;</span>
+WHERE a.name <span class="o">=</span> <span class="s1">&#39;Kurt&#39;</span>
 CREATE <span class="o">(</span>a<span class="o">)</span>-<span class="o">[</span>member <span class="o">{</span>position:<span class="s2">&quot;lead singer&quot;</span><span class="o">}]</span>-&gt;<span class="o">(</span>:band <span class="o">{</span>name:<span class="s2">&quot;Nirvana&quot;</span><span class="o">})</span>
 RETURN
 </pre></div>
@@ -974,6 +974,8 @@ SET n.age <span class="o">=</span> <span class="m">33</span>, n.name <span class
       
     
     
+      
+      <script>!function(e,t,a,n,o,c,i){e.GoogleAnalyticsObject=o,e[o]=e[o]||function(){(e[o].q=e[o].q||[]).push(arguments)},e[o].l=1*new Date,c=t.createElement(a),i=t.getElementsByTagName(a)[0],c.async=1,c.src=n,i.parentNode.insertBefore(c,i)}(window,document,"script","https://www.google-analytics.com/analytics.js","ga"),ga("create","UA-92003007-8","auto"),ga("set","anonymizeIp",!0),ga("send","pageview");var links=document.getElementsByTagName("a");Array.prototype.map.call(links,function(e){e.host!=document.location.host&&e.addEventListener("click",function(){var t=e.getAttribute("data-md-action")||"follow";ga("send","event","outbound",t,e.href)})});var query=document.forms.search.query;query.addEventListener("blur",function(){if(this.value){var e=document.location.pathname;ga("send","pageview",e+"?q="+this.value)}})</script>
       
     
   </body>

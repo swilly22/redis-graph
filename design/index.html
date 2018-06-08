@@ -559,14 +559,14 @@ We use the graph.QUERY command to issue a CREATE query which will introduce new 
 <div class="codehilite"><pre><span></span>graph.QUERY IMDB <span class="s1">&#39;CREATE (aldis:actor {name: &quot;Aldis Hodge&quot;, birth_year: 1986}),</span>
 <span class="s1">                         (oshea:actor {name: &quot;OShea Jackson&quot;, birth_year: 1991}),</span>
 <span class="s1">                         (corey:actor {name: &quot;Corey Hawkins&quot;, birth_year: 1988}),</span>
-<span class="s1">                         (neil:actor {name: &quot;Neil Brown&quot;, birthyear: 1980}),</span>
+<span class="s1">                         (neil:actor {name: &quot;Neil Brown&quot;, birth_year: 1980}),</span>
 <span class="s1">                         (compton:movie {title: &quot;Straight Outta Compton&quot;, genre: &quot;Biography&quot;, votes: 127258, rating: 7.9, year: 2015}),</span>
 <span class="s1">                         (neveregoback:movie {title: &quot;Never Go Back&quot;, genre: &quot;Action&quot;, votes: 15821, rating: 6.4, year: 2016}),</span>
-<span class="s1">                         (aldis)-[act]-&gt;(neveregoback),</span>
-<span class="s1">                         (aldis)-[act]-&gt;(compton),</span>
-<span class="s1">                         (oshea)-[act]-&gt;(compton),</span>
-<span class="s1">                         (corey)-[act]-&gt;(compton),</span>
-<span class="s1">                         (neil)-[act]-&gt;(compton)&#39;</span>
+<span class="s1">                         (aldis)-[:act]-&gt;(neveregoback),</span>
+<span class="s1">                         (aldis)-[:act]-&gt;(compton),</span>
+<span class="s1">                         (oshea)-[:act]-&gt;(compton),</span>
+<span class="s1">                         (corey)-[:act]-&gt;(compton),</span>
+<span class="s1">                         (neil)-[:act]-&gt;(compton)&#39;</span>
 </pre></div>
 
 
@@ -580,8 +580,8 @@ command:</p>
 
 <p>Let's execute a number of queries against our movies graph:</p>
 <p>Find the sum, max, min and avg age of the Straight Outta Compton cast:</p>
-<div class="codehilite"><pre><span></span>GRAPH.QUERY IMDB <span class="s2">&quot;MATCH (a:actor)-[act]-&gt;(m:movie {title:\&quot;Straight Outta Compton\&quot;})</span>
-<span class="s2">RETURN m.title, SUM(a.age), MAX(a.age), MIN(a.age), AVG(a.age)&quot;</span>
+<div class="codehilite"><pre><span></span>GRAPH.QUERY IMDB <span class="s1">&#39;MATCH (a:actor)-[act]-&gt;(m:movie {title:&quot;Straight Outta Compton&quot;})</span>
+<span class="s1">RETURN m.title, SUM(a.age), MAX(a.age), MIN(a.age), AVG(a.age)&#39;</span>
 </pre></div>
 
 
@@ -594,8 +594,8 @@ command:</p>
 <p>The first row is our result-set hearder which name each column according to the return clause.
 Second row contains our query result.</p>
 <p>Let's try another query, this time we'll find in how many movies each actor played.</p>
-<div class="codehilite"><pre><span></span>GRAPH.QUERY IMDB <span class="s2">&quot;MATCH (actor)-[act]-&gt;(movie) RETURN actor.name, COUNT(movie.title) AS movies_count ORDER BY</span>
-<span class="s2">movies_count DESC&quot;</span>
+<div class="codehilite"><pre><span></span>GRAPH.QUERY IMDB <span class="s1">&#39;MATCH (actor)-[act]-&gt;(movie) RETURN actor.name, COUNT(movie.title) AS movies_count ORDER BY</span>
+<span class="s1">movies_count DESC&#39;</span>
 
 <span class="m">1</span><span class="o">)</span> <span class="s2">&quot;actor.name, movies_count&quot;</span>
 <span class="m">2</span><span class="o">)</span> <span class="s2">&quot;Aldis Hodge,2.000000&quot;</span>
@@ -780,6 +780,8 @@ RedisGraph with the help of the open source community.</p>
       
     
     
+      
+      <script>!function(e,t,a,n,o,c,i){e.GoogleAnalyticsObject=o,e[o]=e[o]||function(){(e[o].q=e[o].q||[]).push(arguments)},e[o].l=1*new Date,c=t.createElement(a),i=t.getElementsByTagName(a)[0],c.async=1,c.src=n,i.parentNode.insertBefore(c,i)}(window,document,"script","https://www.google-analytics.com/analytics.js","ga"),ga("create","UA-92003007-8","auto"),ga("set","anonymizeIp",!0),ga("send","pageview");var links=document.getElementsByTagName("a");Array.prototype.map.call(links,function(e){e.host!=document.location.host&&e.addEventListener("click",function(){var t=e.getAttribute("data-md-action")||"follow";ga("send","event","outbound",t,e.href)})});var query=document.forms.search.query;query.addEventListener("blur",function(){if(this.value){var e=document.location.pathname;ga("send","pageview",e+"?q="+this.value)}})</script>
       
     
   </body>
