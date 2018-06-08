@@ -239,6 +239,31 @@
             "location": "/design/#conclusion", 
             "text": "Although RedisGraph is still a young project, it can be an alternative to other graph databases. With its subset of\noperations one can use it to analyze and explore its graph data. Being a Redis module this project is accessible from\nevery Redis client without the need to make any adjustments. It's our intention to keep on improving and extending\nRedisGraph with the help of the open source community.", 
             "title": "Conclusion"
+        }, 
+        {
+            "location": "/docker/", 
+            "text": "Docker\n\n\nUsing Docker\n\n\nBuild Docker image\n\n\nRedisGraph's \nDockerfile\n uses a recent verion of Docker in order to take\nadvantage of features such as \nbuild stages\n.\nTo build RedisGraph Docker images, you will need a version of Docker equal to\nor greater than 17.05. To update the Docker on your system, see the\n\nDocker update documentation\n\nfor your OS.\n\n\nThe RedisGraph Docker build has been updated to run the tests after compiling\nthe module, so running the tests with Docker is simply a matter of executing\nthe following:\n\n\n$ make docker\n\n\n\n\n\nAs the output scrolls by, towards the end you will see the tests get run, and\nif all goes as expected, you will see them all pass.\n\n\nRunning within a Docker container\n\n\nTo run RedisGraph within docker simply execute:\n\n\n$ docker run -p 6379:6379 redislabs/redisgraph", 
+            "title": "Docker"
+        }, 
+        {
+            "location": "/docker/#docker", 
+            "text": "", 
+            "title": "Docker"
+        }, 
+        {
+            "location": "/docker/#using-docker", 
+            "text": "", 
+            "title": "Using Docker"
+        }, 
+        {
+            "location": "/docker/#build-docker-image", 
+            "text": "RedisGraph's  Dockerfile  uses a recent verion of Docker in order to take\nadvantage of features such as  build stages .\nTo build RedisGraph Docker images, you will need a version of Docker equal to\nor greater than 17.05. To update the Docker on your system, see the Docker update documentation \nfor your OS.  The RedisGraph Docker build has been updated to run the tests after compiling\nthe module, so running the tests with Docker is simply a matter of executing\nthe following:  $ make docker  As the output scrolls by, towards the end you will see the tests get run, and\nif all goes as expected, you will see them all pass.", 
+            "title": "Build Docker image"
+        }, 
+        {
+            "location": "/docker/#running-within-a-docker-container", 
+            "text": "To run RedisGraph within docker simply execute:  $ docker run -p 6379:6379 redislabs/redisgraph", 
+            "title": "Running within a Docker container"
         }
     ]
 }
