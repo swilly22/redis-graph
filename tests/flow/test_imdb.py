@@ -152,6 +152,26 @@ class ImdbFlowTest(FlowTestsBase):
         # assert query run time
         self._assert_run_time(actual_result, queries.find_ten_oldest_actors_query)
 
+    def test_index_scan_actors_over_85(self):
+        global redis_graph
+
+        # create index on :actor(age)
+        redis_graph.query(queries.build_index_query.query)
+
+        # verify that the execution plan contains an Index Scan
+        execution_plan = redis_graph.execution_plan(queries.actors_over_85_index_scan.query)
+        self.assertIn('Index Scan', execution_plan)
+
+        actual_result = redis_graph.query(queries.actors_over_85_index_scan.query)
+
+        # assert result set
+        self._assert_only_expected_resuls_are_in_actual_results(
+            actual_result,
+            queries.actors_over_85_index_scan)
+
+        # assert query run time
+        self._assert_run_time(actual_result, queries.actors_over_85_index_scan)
+
 
 if __name__ == '__main__':
     unittest.main()

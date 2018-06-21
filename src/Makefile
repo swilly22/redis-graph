@@ -5,7 +5,7 @@ CC=gcc
 export CC
 
 # if DEBUG env var is set, we compile with "debug" cflags
-DEBUGFLAGS = -g -ggdb -O3 
+DEBUGFLAGS = -g -ggdb -O3
 ifeq ($(DEBUG), 1)
 	DEBUGFLAGS = -g -ggdb3 -O0
 endif
@@ -45,6 +45,7 @@ CC_SOURCES += $(wildcard $(SOURCEDIR)/resultset/*.c)
 CC_SOURCES += $(wildcard $(SOURCEDIR)/stores/*.c)
 CC_SOURCES += $(wildcard $(SOURCEDIR)/util/*.c)
 CC_SOURCES += $(wildcard $(SOURCEDIR)/dep/rax/*.c)
+CC_SOURCES += $(wildcard $(SOURCEDIR)/index/*.c)
 
 # Convert all sources to .o files
 CC_OBJECTS = $(patsubst %.c, %.o, $(CC_SOURCES) )

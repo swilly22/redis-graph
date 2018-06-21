@@ -10,6 +10,7 @@
 #include "op_expand_into.h"
 #include "op_filter.h"
 #include "op_node_by_label_scan.h"
+#include "op_index_scan.h"
 #include "op_produce_results.h"
 #include "op_update.h"
 

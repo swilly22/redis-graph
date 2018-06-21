@@ -35,8 +35,8 @@ typedef struct {
 			char* property;
 		} Rop;
 	};
-	FT_CompareValueType t; 	/* Comapred value type, constant/node. */
-	CmpFunc cf;				/* Compare function, determins relation between val and element property. */
+	FT_CompareValueType t; 	/* Compared value type, constant/node. */
+	CmpFunc cf;				/* Compare function, determines relation between val and element property. */
 } FT_PredicateNode;
 
 typedef struct {
@@ -51,7 +51,7 @@ struct FT_FilterNode {
     FT_PredicateNode pred;
     FT_ConditionNode cond;
   };
-  FT_FilterNodeType t;	/* Determins actual type of this node. */
+  FT_FilterNodeType t;	/* Determines actual type of this node. */
 };
 
 typedef struct FT_FilterNode FT_FilterNode;
@@ -73,6 +73,9 @@ int applyFilters(const Graph* g, const FT_FilterNode* root);
 /* Checks to see if aliased node is within the filter tree. */
 int FilterTree_ContainsNode(const FT_FilterNode *root, const Vector *aliases);
 
+/* Builds Vector of constant filters associated with specific alias */
+Vector* FilterTree_CollectAliasConsts(const FT_FilterNode *root, const char *alias);
+
 /* Clones given tree */
 void FilterTree_Clone(const FT_FilterNode *root, FT_FilterNode **clone);
 
@@ -86,4 +89,4 @@ FT_FilterNode* FilterTree_MinFilterTree(FT_FilterNode *root, Vector *aliases);
 
 void FilterTree_Free(FT_FilterNode *root);
 
-#endif // _FILTER_TREE_H 
+#endif // _FILTER_TREE_H

@@ -338,6 +338,11 @@ ExecutionPlan *NewExecutionPlan(RedisModuleCtx *ctx, const char *graph_name, AST
     execution_plan->graph_name = graph_name;
     execution_plan->result_set = NewResultSet(ast);
 
+    // Build the filter tree if necessary first, as it will be used to find applicable indices
+    if(ast->whereNode != NULL) {
+        execution_plan->filter_tree = BuildFiltersTree(ast->whereNode->filters);
+    }
+
     Vector_Push(Ops, execution_plan->root);
 
     /* Get all nodes without incoming edges */
@@ -379,15 +384,30 @@ ExecutionPlan *NewExecutionPlan(RedisModuleCtx *ctx, const char *graph_name, AST
         } else {
             /* Node doesn't have any incoming nor outgoing edges, 
              * this is an hanging node "()", create a scan operation. */
-            OpNode *scan_op;
+            OpNode *scan_op = NULL;
+            Node **graph_node = Graph_GetNodeRef(graph, node);
             if(node->label) {
-                /* TODO: when indexing is enabled, use index when possible. */
-                scan_op = NewOpNode(NewNodeByLabelScanOp(ctx, graph, Graph_GetNodeRef(graph, node),
-                                    graph_name, node->label));
+                if (execution_plan->filter_tree != NULL) {
+                    /* If a filter tree has been built and an index store exists,
+                     * try to build an IndexScan */
+                    Vector *filters = FilterTree_CollectAliasConsts(execution_plan->filter_tree,
+                                                                    Graph_GetNodeAlias(graph, *graph_node));
+                    if (filters != NULL) {
+                        IndexIterator *iter = Index_IntersectFilters(ctx, graph_name, filters, node->label);
+                        Vector_Free(filters);
+                        if (iter != NULL) {
+                            scan_op = NewOpNode(NewIndexScanOp(graph, graph_node, iter));
+                        }
+                    }
+                }
+                if (scan_op == NULL) {
+                    /* Node has a label, but no viable index - use a LabelScan */
+                    scan_op = NewOpNode(NewNodeByLabelScanOp(ctx, graph, graph_node,
+                                        graph_name, node->label));
+                }
             } else {
                 /* Node is not labeled, no other option but a full scan. */
-                scan_op = NewOpNode(NewAllNodeScanOp(ctx, graph, Graph_GetNodeRef(graph, node),
-                                    graph_name));
+                scan_op = NewOpNode(NewAllNodeScanOp(ctx, graph, graph_node, graph_name));
             }
             Vector_Push(Ops, scan_op);
         }
@@ -457,7 +477,6 @@ ExecutionPlan *NewExecutionPlan(RedisModuleCtx *ctx, const char *graph_name, AST
     }
 
     if(ast->whereNode != NULL) {
-        execution_plan->filter_tree = BuildFiltersTree(ast->whereNode->filters);
         _ExecutionPlan_AddFilters(execution_plan->root, &execution_plan->filter_tree);
     }
 
